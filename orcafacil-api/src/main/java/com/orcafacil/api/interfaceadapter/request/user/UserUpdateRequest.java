@@ -1,37 +1,36 @@
 package com.orcafacil.api.interfaceadapter.request.user;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-
+import com.orcafacil.api.domain.address.Address;
+import jakarta.validation.constraints.*;
 import java.util.Date;
 
-public class UpdateUserResquest {
+public class UserUpdateRequest {
 
-    @NotBlank(message = "Nome é obrigatório.")
     @Size(max = 100, message = "Nome não pode exceder 100 caracteres.")
     private String name;
 
-    @NotBlank(message = "Telefone é obrigatório.")
     @Pattern(regexp = "\\d{10,}", message = "Telefone deve conter ao menos 10 dígitos numéricos.")
     private String phone;
 
-    @NotBlank(message = "CPF é obrigatório.")
+    @Email(message = "Email deve ser válido.")
+    private String email;
+
+    private String password;
+
+    private String currentPassword;
+
     @Pattern(regexp = "\\d{11}", message = "CPF deve conter exatamente 11 dígitos numéricos.")
     private String cpf;
 
-    @NotNull(message = "Tipo de usuário é obrigatório.")
     private String userType;
 
-    @NotNull(message = "Data de nascimento é obrigatória.")
     private Date birthDate;
 
-    @NotNull(message = "Status é obrigatório.")
     private String status;
 
-    @NotNull(message = "Endereço é obrigatório.")
-    private Integer addressId;
+    private Address address;
+
+    // Getters e setters
 
     public String getName() {
         return name;
@@ -47,6 +46,30 @@ public class UpdateUserResquest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getCurrentPassword() {
+        return currentPassword;
+    }
+
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
     }
 
     public String getCpf() {
@@ -81,11 +104,11 @@ public class UpdateUserResquest {
         this.status = status;
     }
 
-    public Integer getAddressId() {
-        return addressId;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAddressId(Integer addressId) {
-        this.addressId = addressId;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

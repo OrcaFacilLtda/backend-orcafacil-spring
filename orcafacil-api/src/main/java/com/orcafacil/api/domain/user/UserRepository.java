@@ -8,6 +8,8 @@ public interface UserRepository {
     void delete(Integer id);
     User update(User user);
     Optional<User> findById(Integer id);
+    List<User> findUserByType(String type);
+    List<User> findByStatus(UserStatus status);
     List<User> findAll();
     Optional<User> findByEmail(String email);
     Optional<User> findByCpf(String cpf);

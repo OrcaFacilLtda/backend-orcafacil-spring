@@ -1,9 +1,10 @@
 package com.orcafacil.api.interfaceadapter.request.user;
 
+import com.orcafacil.api.domain.address.Address;
 import jakarta.validation.constraints.*;
 import java.util.Date;
 
-public class CreateUserRequest {
+public class UserRequest {
 
     @NotBlank(message = "Nome é obrigatório.")
     @Size(max = 100, message = "Nome não pode exceder 100 caracteres.")
@@ -12,6 +13,15 @@ public class CreateUserRequest {
     @NotBlank(message = "Telefone é obrigatório.")
     @Pattern(regexp = "\\d{10,}", message = "Telefone deve conter ao menos 10 dígitos numéricos.")
     private String phone;
+
+
+    @NotBlank(message = "Email é obrigatório.")
+    private String email;
+
+
+    @NotBlank(message = "Senha é obrigatório.")
+    private String password;
+
 
     @NotBlank(message = "CPF é obrigatório.")
     @Pattern(regexp = "\\d{11}", message = "CPF deve conter exatamente 11 dígitos numéricos.")
@@ -26,8 +36,8 @@ public class CreateUserRequest {
     @NotNull(message = "Status é obrigatório.")
     private String status;
 
-    @NotNull(message = "Endereço é obrigatório.")
-    private Integer addressId;
+    @NotNull(message = "Id do Endereço é obrigatório.")
+    private Address address;
 
     public String getName() {
         return name;
@@ -44,6 +54,14 @@ public class CreateUserRequest {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public String getEmail() {return email;}
+
+    public void setEmail(String email) {this.email = email;}
+
+    public String getPassword() {return password;}
+
+    public void setPassword(String password) {this.password = password;}
 
     public String getCpf() {
         return cpf;
@@ -77,11 +95,11 @@ public class CreateUserRequest {
         this.status = status;
     }
 
-    public Integer getAddressId() {
-        return addressId;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAddressId(Integer addressId) {
-        this.addressId = addressId;
+    public void setAddressId(Address address) {
+        this.address = address;
     }
 }

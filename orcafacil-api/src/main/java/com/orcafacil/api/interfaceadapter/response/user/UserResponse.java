@@ -1,4 +1,4 @@
-package com.orcafacil.api.interfaceadapter.response;
+package com.orcafacil.api.interfaceadapter.response.user;
 
 import java.util.Date;
 
