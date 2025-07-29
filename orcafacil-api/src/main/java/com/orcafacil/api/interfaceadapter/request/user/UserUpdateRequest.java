@@ -1,6 +1,7 @@
 package com.orcafacil.api.interfaceadapter.request.user;
 
 import com.orcafacil.api.domain.address.Address;
+import com.orcafacil.api.interfaceadapter.request.address.AddressRequest;
 import jakarta.validation.constraints.*;
 import java.util.Date;
 
@@ -28,87 +29,51 @@ public class UserUpdateRequest {
 
     private String status;
 
-    private Address address;
+    private AddressRequest address;
 
     // Getters e setters
 
-    public String getName() {
-        return name;
-    }
+    public String getName() {return name;}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) {this.name = name;}
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getPhone() {return phone;}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public void setPhone(String phone) {this.phone = phone;}
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() {return email;}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public void setEmail(String email) {this.email = email;}
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() {return password;}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public void setPassword(String password) {this.password = password;}
 
-    public String getCurrentPassword() {
-        return currentPassword;
-    }
+    public String getCurrentPassword() {return currentPassword;}
 
-    public void setCurrentPassword(String currentPassword) {
-        this.currentPassword = currentPassword;
-    }
+    public void setCurrentPassword(String currentPassword) {this.currentPassword = currentPassword;}
 
-    public String getCpf() {
-        return cpf;
-    }
+    public String getCpf() {return cpf;}
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
+    public void setCpf(String cpf) {this.cpf = cpf;}
 
-    public String getUserType() {
-        return userType;
-    }
+    public String getUserType() {return userType;}
 
-    public void setUserType(String userType) {
-        this.userType = userType;
-    }
+    public void setUserType(String userType) {this.userType = userType;}
 
-    public Date getBirthDate() {
-        return birthDate;
-    }
+    public Date getBirthDate() {return birthDate;}
 
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
-    }
+    public void setBirthDate(Date birthDate) {this.birthDate = birthDate;}
 
-    public String getStatus() {
-        return status;
+    public String getStatus() {return status;
     }
+    public void setStatus(String status) {this.status = status;}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Address getAddress() {
+    public AddressRequest getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(AddressRequest address) {
         this.address = address;
     }
 }

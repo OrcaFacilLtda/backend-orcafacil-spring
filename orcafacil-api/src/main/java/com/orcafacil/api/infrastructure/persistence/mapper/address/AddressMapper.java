@@ -2,6 +2,7 @@ package com.orcafacil.api.infrastructure.persistence.mapper.address;
 
 import com.orcafacil.api.domain.address.Address;
 import com.orcafacil.api.infrastructure.persistence.entity.address.AddressEntity;
+import com.orcafacil.api.interfaceadapter.request.address.AddressRequest;
 
 public class AddressMapper {
 
@@ -29,6 +30,21 @@ public class AddressMapper {
                 entity.getState(),
                 entity.getComplement()
         );
+    }
+
+    public static Address fromRequest(AddressRequest request, Integer id) {
+        return new Address(
+                id,
+                request.getZipCode(),
+                request.getStreet(),
+                request.getNumber(),
+                request.getNeighborhood(),
+                request.getCity(),
+                request.getState(),
+                request.getComplement()
+        );
+
+
     }
 
 }

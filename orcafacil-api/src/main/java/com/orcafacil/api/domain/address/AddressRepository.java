@@ -1,8 +1,5 @@
 package com.orcafacil.api.domain.address;
 
-import com.orcafacil.api.domain.address.Address;
-import com.orcafacil.api.domain.user.User;
-
 import java.util.List;
 import java.util.Optional;
 

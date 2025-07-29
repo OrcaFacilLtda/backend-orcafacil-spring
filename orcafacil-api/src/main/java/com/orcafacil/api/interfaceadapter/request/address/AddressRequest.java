@@ -5,6 +5,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class AddressRequest {
+
+    @NotBlank(message = "id é obrigatório")
+    private Integer id;
+
     @NotBlank(message = "Rua é obrigatória")
     @Size(max = 100)
     private String street;
@@ -54,4 +58,8 @@ public class AddressRequest {
 
     public String getZipCode() { return zipCode; }
     public void setZipCode(String zipCode) { this.zipCode = zipCode; }
+
+    public Integer getId() {return id;}
+
+    public void setId(Integer id) {this.id = id;}
 }

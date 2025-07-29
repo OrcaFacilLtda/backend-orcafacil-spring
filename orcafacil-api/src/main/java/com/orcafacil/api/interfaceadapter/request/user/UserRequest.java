@@ -1,6 +1,7 @@
 package com.orcafacil.api.interfaceadapter.request.user;
 
 import com.orcafacil.api.domain.address.Address;
+import com.orcafacil.api.interfaceadapter.request.address.AddressRequest;
 import jakarta.validation.constraints.*;
 import java.util.Date;
 
@@ -37,7 +38,7 @@ public class UserRequest {
     private String status;
 
     @NotNull(message = "Id do Endereço é obrigatório.")
-    private Address address;
+    private AddressRequest address;
 
     public String getName() {
         return name;
@@ -95,11 +96,7 @@ public class UserRequest {
         this.status = status;
     }
 
-    public Address getAddress() {
-        return address;
-    }
+    public AddressRequest getAddress() {return address;}
 
-    public void setAddressId(Address address) {
-        this.address = address;
-    }
+    public void setAddress(AddressRequest address) {this.address = address;}
 }
