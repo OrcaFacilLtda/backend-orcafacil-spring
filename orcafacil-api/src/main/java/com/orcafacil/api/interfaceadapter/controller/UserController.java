@@ -4,11 +4,11 @@ import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.domain.user.User;
 import com.orcafacil.api.domain.user.UserStatus;
 import com.orcafacil.api.interfaceadapter.request.user.UserRequest;
+import com.orcafacil.api.interfaceadapter.request.user.UserUpdateRequest;
+import com.orcafacil.api.interfaceadapter.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -21,56 +21,63 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody UserRequest request) {
+    public ResponseEntity<ApiResponse<User>> create(@RequestBody UserRequest request) {
         User created = userService.create(request);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.status(201)
+                .body(new ApiResponse<>(true, "Usuário criado com sucesso.", created));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Integer id, @RequestBody UserRequest request) {
+    public ResponseEntity<ApiResponse<User>> update(@PathVariable Integer id, @RequestBody UserUpdateRequest request) {
         User updated = userService.update(id, request);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Usuário atualizado com sucesso.", updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Integer id) {
         userService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Usuário deletado com sucesso.", null));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Integer id) {
-        Optional<User> user = userService.findById(id);
-        return user.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<User>> findById(@PathVariable Integer id) {
+        return userService.findById(id)
+                .map(user -> ResponseEntity.ok(new ApiResponse<>(true, "Usuário encontrado.", user)))
+                .orElse(ResponseEntity.status(404)
+                        .body(new ApiResponse<>(false, "Usuário não encontrado.", null)));
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<ApiResponse<List<User>>> findAll() {
+        List<User> users = userService.findAll();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Usuários listados com sucesso.", users));
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<User> findByEmail(@PathVariable String email) {
-        Optional<User> user = userService.findByEmail(email);
-        return user.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<User>> findByEmail(@PathVariable String email) {
+        return userService.findByEmail(email)
+                .map(user -> ResponseEntity.ok(new ApiResponse<>(true, "Usuário encontrado por e-mail.", user)))
+                .orElse(ResponseEntity.status(404)
+                        .body(new ApiResponse<>(false, "Usuário não encontrado com esse e-mail.", null)));
     }
 
     @GetMapping("/cpf/{cpf}")
-    public ResponseEntity<User> findByCpf(@PathVariable String cpf) {
-        Optional<User> user = userService.findByCpf(cpf);
-        return user.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<User>> findByCpf(@PathVariable String cpf) {
+        return userService.findByCpf(cpf)
+                .map(user -> ResponseEntity.ok(new ApiResponse<>(true, "Usuário encontrado por CPF.", user)))
+                .orElse(ResponseEntity.status(404)
+                        .body(new ApiResponse<>(false, "Usuário não encontrado com esse CPF.", null)));
     }
 
     @GetMapping("/type/{type}")
-    public ResponseEntity<List<User>> findByType(@PathVariable String type) {
-        return ResponseEntity.ok(userService.findByType(type));
+    public ResponseEntity<ApiResponse<List<User>>> findByType(@PathVariable String type) {
+        List<User> users = userService.findByType(type);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Usuários encontrados por tipo.", users));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<User>> findByStatus(@PathVariable UserStatus status) {
-        return ResponseEntity.ok(userService.findByStatus(status));
+    public ResponseEntity<ApiResponse<List<User>>> findByStatus(@PathVariable UserStatus status) {
+        List<User> users = userService.findByStatus(status);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Usuários encontrados por status.", users));
     }
 }

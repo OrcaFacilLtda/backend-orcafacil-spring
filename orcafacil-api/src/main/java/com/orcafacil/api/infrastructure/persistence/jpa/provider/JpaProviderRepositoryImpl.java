@@ -42,4 +42,14 @@ public class JpaProviderRepositoryImpl implements ProviderRepository {
     public void deleteById(Integer id) {
         springDataProviderRepository.deleteById(id);
     }
+
+    @Override
+    public Provider update(Provider provider) {
+        return null;
+    }
+
+    @Override
+    public boolean existsById(Integer id) {
+        return  springDataProviderRepository.existsById(id);
+    }
 }

@@ -1,6 +1,5 @@
 package com.orcafacil.api.interfaceadapter.request.user;
 
-import com.orcafacil.api.domain.address.Address;
 import com.orcafacil.api.interfaceadapter.request.address.AddressRequest;
 import jakarta.validation.constraints.*;
 import java.util.Date;
@@ -31,7 +30,6 @@ public class UserUpdateRequest {
 
     private AddressRequest address;
 
-    // Getters e setters
 
     public String getName() {return name;}
 

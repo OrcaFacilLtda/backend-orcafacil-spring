@@ -6,8 +6,8 @@ import java.util.Optional;
 public interface AddressRepository {
     Address save(Address address);
     Optional<Address> findById(Integer id);
-    List<Address> findByUserId(Integer userId);
-    List<Address> findByProviderId(Integer providerId);
+    Optional<Address> findByUserId(Integer userId);
+    Optional<Address> findByProviderId(Integer providerId);
     void deleteById(Integer id);
 
     Address update(Address address);

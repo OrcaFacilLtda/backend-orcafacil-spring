@@ -7,11 +7,14 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "provider")
 public class ProviderEntity {
-
     @Id
+    private Integer id;
+
     @OneToOne(optional = false)
+    @MapsId
     @JoinColumn(name = "id", referencedColumnName = "id")
-    private UserEntity user; // O ID do provider vem do usuário
+    private UserEntity user;
+
 
     @OneToOne(optional = false)
     @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = false, unique = true)

@@ -1,8 +1,11 @@
 package com.orcafacil.api.infrastructure.persistence.mapper.user;
 
 import com.orcafacil.api.domain.user.User;
+import com.orcafacil.api.domain.user.UserStatus;
+import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.infrastructure.persistence.entity.user.UserEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.address.AddressMapper;
+import com.orcafacil.api.interfaceadapter.request.user.UserRequest;
 
 public class UserMapper {
 
@@ -35,4 +38,20 @@ public class UserMapper {
                 AddressMapper.toDomain(entity.getAddress())
         );
     }
+
+    public static User toDomain(UserRequest request) {
+        return new User(
+                null,
+                request.getName(),
+                request.getPhone(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getCpf(),
+                UserType.valueOf(request.getUserType().toUpperCase()),
+                request.getBirthDate(),
+                UserStatus.valueOf(request.getStatus().toUpperCase()),
+                AddressMapper.fromRequest(request.getAddress(),request.getAddress().getId())
+        );
+    }
+
 }

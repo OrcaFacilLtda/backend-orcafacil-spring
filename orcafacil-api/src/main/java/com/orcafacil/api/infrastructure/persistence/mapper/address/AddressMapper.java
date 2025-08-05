@@ -43,8 +43,6 @@ public class AddressMapper {
                 request.getState(),
                 request.getComplement()
         );
-
-
     }
 
 }

@@ -5,13 +5,22 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
 public interface SpringDataAddressRepository extends JpaRepository<AddressEntity, Integer> {
-    List<AddressEntity> findByUserId(Integer userId);
-    List<AddressEntity> findByProviderId(Integer providerId);
+
+    @Query(value = "SELECT a.* FROM address a " +
+            "JOIN user_account u ON u.address_id = a.id " +
+            "WHERE u.id = :userId", nativeQuery = true)
+    AddressEntity findByUserId(@Param("userId") Integer userId);
+
+    @Query(value = "SELECT a.* FROM address a " +
+            "JOIN company c ON c.address_id = a.id " +
+            "WHERE c.id = :providerId", nativeQuery = true)
+    AddressEntity findByProviderId(@Param("providerId") Integer providerId);
 
     @Modifying
     @Transactional

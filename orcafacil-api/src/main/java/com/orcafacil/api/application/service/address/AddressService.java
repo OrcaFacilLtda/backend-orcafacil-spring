@@ -9,7 +9,6 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -47,7 +46,7 @@ public class AddressService {
         return optAddress.get();
     }
 
-    public List<Address> getAddressByUserId(Integer userId) {
+    public Optional<Address> getAddressByUserId(Integer userId) {
         if (userId == null || userId <= 0) {
             throw new IllegalArgumentException("ID de usuário inválido.");
         }
@@ -55,11 +54,10 @@ public class AddressService {
         return addressRepository.findByUserId(userId);
     }
 
-    public List<Address> getAddressByProviderId(Integer providerId) {
+    public Optional<Address> getAddressByProviderId(Integer providerId) {
         if (providerId == null || providerId <= 0) {
             throw new IllegalArgumentException("ID de fornecedor inválido.");
         }
-
         return addressRepository.findByProviderId(providerId);
     }
 

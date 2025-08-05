@@ -44,7 +44,7 @@ public class UserEntity {
     private UserStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "address_id", nullable = false, unique = true)
+    @JoinColumn(name = "address_id", nullable = false, unique = true)
     private AddressEntity address;
 
     protected UserEntity() {}

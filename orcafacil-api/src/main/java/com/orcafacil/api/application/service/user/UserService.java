@@ -51,6 +51,30 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User create(UserRequest request, Address address) {
+        Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException("Dados do usuário inválidos", violations);
+        }
+
+        Address userAddress = address != null ? address : addressService.createAddress(request.getAddress());
+
+        User user = new User(
+                null,
+                request.getName(),
+                request.getPhone(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getCpf(),
+                UserType.valueOf(request.getUserType()),
+                request.getBirthDate(),
+                UserStatus.valueOf(request.getStatus()),
+                userAddress
+        );
+
+        return userRepository.save(user);
+    }
+
     public User update(Integer id, UserUpdateRequest request) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID do usuário inválido.");
@@ -139,5 +163,19 @@ public class UserService {
             throw new IllegalArgumentException("Status não pode ser nulo.");
         }
         return userRepository.findByStatus(status);
+    }
+
+    public boolean existsByEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email não pode ser vazio.");
+        }
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public boolean existsByCpf(String cpf) {
+        if (cpf == null || !cpf.matches("\\d{11}")) {
+            throw new IllegalArgumentException("CPF deve conter 11 dígitos numéricos.");
+        }
+        return userRepository.findByCpf(cpf).isPresent();
     }
 }

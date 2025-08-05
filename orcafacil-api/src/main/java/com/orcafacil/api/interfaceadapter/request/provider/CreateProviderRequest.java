@@ -1,29 +1,29 @@
 package com.orcafacil.api.interfaceadapter.request.provider;
 
-
-import com.orcafacil.api.domain.category.Category;
-import com.orcafacil.api.domain.company.Company;
-import com.orcafacil.api.domain.user.User;
+import com.orcafacil.api.interfaceadapter.request.company.CreateCompanyRequest;
+import com.orcafacil.api.interfaceadapter.request.user.UserRequest;
 import jakarta.validation.constraints.NotNull;
 
 public class CreateProviderRequest {
-    @NotNull(message = "Id do úsuario é obrigatório")
-    private User user;
-    @NotNull(message = "Id da empresa é obrigatório")
-    private Company company;
 
-    @NotNull(message = "Id da categoria é obrigatório")
-    private Category category;
+    @NotNull(message = "Dados do usuário são obrigatórios")
+    private UserRequest userRequest;
 
-    public User getUser() {return user;}
+    @NotNull(message = "Dados da empresa são obrigatórios")
+    private CreateCompanyRequest companyRequest;
 
-    public void setUser(User user) {this.user = user;}
+    @NotNull(message = "Categoria é obrigatória")
+    private Integer categoryId;
 
-    public Company getCompany() {return company;}
+    public UserRequest getUserRequest() { return userRequest; }
 
-    public void setCompany(Company company) {this.company = company;}
+    public void setUserRequest(UserRequest userRequest) { this.userRequest = userRequest; }
 
-    public Category getCategory() {return category;}
+    public CreateCompanyRequest getCompanyRequest() { return companyRequest; }
 
-    public void setCategory(Category category) {this.category = category;}
+    public void setCompanyRequest(CreateCompanyRequest companyRequest) { this.companyRequest = companyRequest; }
+
+    public Integer getCategoryId() { return categoryId; }
+
+    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 }

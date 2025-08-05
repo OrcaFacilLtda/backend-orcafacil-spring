@@ -26,7 +26,7 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, Inte
     @Transactional
     @Modifying
     @Query("UPDATE UserEntity u SET u.name = :name, u.email = :email, u.password = :password, u.phone = :phone, " +
-            "u.userType = :userType, u.birthDate = :birthDate, u.cpf = :cpf, u.status = :status, u.addressId = :addressId " +
+            "u.userType = :userType, u.birthDate = :birthDate, u.cpf = :cpf, u.status = :status, u.address= :addressId " +
             "WHERE u.id = :id")
     int updateUser(
             @Param("id") Integer id,

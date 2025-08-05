@@ -29,7 +29,7 @@ public class JpaUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void deleteById(Integer id) {
         springDataUserRepository.deleteById(id);
     }
 
@@ -77,7 +77,8 @@ public class JpaUserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByCpf(String cpf) {
-        return springDataUserRepository.findByCpf(cpf)
+        return springDataUserRepository
+                .findByCpf(cpf)
                 .map(UserMapper::toDomain);
     }
 }
