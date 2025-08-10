@@ -5,6 +5,8 @@ import com.orcafacil.api.domain.company.Company;
 import com.orcafacil.api.domain.exception.DomainException;
 import com.orcafacil.api.domain.user.User;
 
+import java.util.Objects;
+
 public class Provider {
     private final User user;
     private final Company company;
@@ -38,9 +40,52 @@ public class Provider {
         }
     }
 
-    public User getUser() {return user;}
+    public User getUser() {
+        return user;
+    }
 
-    public Company getCompany() {return company;}
+    public Company getCompany() {
+        return company;
+    }
 
-    public Category getCategory() {return category;}
+    public Category getCategory() {
+        return category;
+    }
+
+    // Métodos withX para imutabilidade
+    public Provider withUser(User newUser) {
+        return new Provider(newUser, this.company, this.category);
+    }
+
+    public Provider withCompany(Company newCompany) {
+        return new Provider(this.user, newCompany, this.category);
+    }
+
+    public Provider withCategory(Category newCategory) {
+        return new Provider(this.user, this.company, newCategory);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Provider)) return false;
+        Provider that = (Provider) o;
+        return user.equals(that.user) &&
+                company.equals(that.company) &&
+                category.equals(that.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, company, category);
+    }
+
+    @Override
+    public String toString() {
+        return "Provider{" +
+                "user=" + user +
+                ", company=" + company +
+                ", category=" + category +
+                '}';
+    }
 }

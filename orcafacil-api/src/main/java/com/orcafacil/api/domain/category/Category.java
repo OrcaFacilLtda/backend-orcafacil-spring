@@ -31,10 +31,27 @@ public class Category {
         return value == null || value.trim().isEmpty();
     }
 
+    public Integer getId() {
+        return id;
+    }
 
-    public String getDescription() {return description;}
+    public String getName() {
+        return name;
+    }
 
-    public Integer getId() {return id;}
+    public String getDescription() {
+        return description;
+    }
 
-    public String getName() {return name;}
+    public Category withId(Integer newId) {
+        return new Category(newId, name, description);
+    }
+
+    public Category withName(String newName) {
+        return new Category(id, newName, description);
+    }
+
+    public Category withDescription(String newDescription) {
+        return new Category(id, name, newDescription);
+    }
 }

@@ -112,6 +112,38 @@ public class Address {
         return complement;
     }
 
+    public Address withId(Integer newId) {
+        return new Address(newId, zipCode, street, number, neighborhood, city, state, complement);
+    }
+
+    public Address withZipCode(String newZipCode) {
+        return new Address(id, newZipCode, street, number, neighborhood, city, state, complement);
+    }
+
+    public Address withStreet(String newStreet) {
+        return new Address(id, zipCode, newStreet, number, neighborhood, city, state, complement);
+    }
+
+    public Address withNumber(String newNumber) {
+        return new Address(id, zipCode, street, newNumber, neighborhood, city, state, complement);
+    }
+
+    public Address withNeighborhood(String newNeighborhood) {
+        return new Address(id, zipCode, street, number, newNeighborhood, city, state, complement);
+    }
+
+    public Address withCity(String newCity) {
+        return new Address(id, zipCode, street, number, neighborhood, newCity, state, complement);
+    }
+
+    public Address withState(String newState) {
+        return new Address(id, zipCode, street, number, neighborhood, city, newState, complement);
+    }
+
+    public Address withComplement(String newComplement) {
+        return new Address(id, zipCode, street, number, neighborhood, city, state, newComplement);
+    }
+
     @Override
     public String toString() {
         String baseAddress = street + ", " + number;

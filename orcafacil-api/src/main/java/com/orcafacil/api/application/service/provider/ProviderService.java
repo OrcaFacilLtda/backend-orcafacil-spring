@@ -92,38 +92,24 @@ public class ProviderService {
     }
 
     @Transactional
-    public Provider updateCategory(Integer providerId, Integer categoryId) {
-        Provider existingProvider = repository.findById(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
-
-        Category newCategory = categoryService.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
-
-        Provider updatedProvider = new Provider(
-                existingProvider.getUser(),
-                existingProvider.getCompany(),
-                newCategory
-        );
-
-        return repository.save(updatedProvider);
-    }
-
-    @Transactional
     public Provider update(Integer providerId, UpdateProviderRequest request) {
+        if (providerId == null || providerId <= 0) {
+            throw new IllegalArgumentException("ID do provider inválido.");
+        }
+
         Provider provider = repository.findById(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
 
         if (request.getUserUpdateRequest() != null) {
             userService.update(provider.getUser().getId(), request.getUserUpdateRequest());
         }
-
         if (request.getCompanyUpdateRequest() != null) {
             companyService.update(provider.getCompany().getId(), request.getCompanyUpdateRequest());
         }
 
-        Category category = provider.getCategory();
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(category.getId())) {
-            category = categoryService.findById(request.getCategoryId())
+        Category updatedCategory = provider.getCategory();
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(updatedCategory.getId())) {
+            updatedCategory = categoryService.findById(request.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
         }
 
@@ -132,8 +118,12 @@ public class ProviderService {
         Company updatedCompany = companyService.findByUserId(provider.getCompany().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
 
-        Provider updatedProvider = new Provider(updatedUser, updatedCompany, category);
+        Provider updatedProvider = provider
+                .withUser(updatedUser)
+                .withCompany(updatedCompany)
+                .withCategory(updatedCategory);
 
         return repository.save(updatedProvider);
     }
+
 }

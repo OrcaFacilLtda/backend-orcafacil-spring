@@ -88,16 +88,41 @@ public class UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        if (request.getName() != null) existingUser = existingUser.withName(request.getName());
-        if (request.getPhone() != null) existingUser = existingUser.withPhone(request.getPhone());
-        if (request.getEmail() != null) existingUser = existingUser.withEmail(request.getEmail());
-        if (request.getCpf() != null) existingUser = existingUser.withCpf(request.getCpf());
-        if (request.getUserType() != null) existingUser = existingUser.withUserType(UserType.valueOf(request.getUserType()));
-        if (request.getBirthDate() != null) existingUser = existingUser.withBirthDate(request.getBirthDate());
-        if (request.getStatus() != null) existingUser = existingUser.withStatus(UserStatus.valueOf(request.getStatus()));
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+            existingUser = existingUser.withName(request.getName());
+        }
 
-        if (request.getAddress() != null && request.getAddress().getId() != null) {
-            Address updatedAddress = addressService.updateAddress(request.getAddress().getId(), request.getAddress());
+        if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
+            existingUser = existingUser.withPhone(request.getPhone());
+        }
+
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            existingUser = existingUser.withEmail(request.getEmail());
+        }
+
+        if (request.getCpf() != null && request.getCpf().matches("\\d{11}")) {
+            existingUser = existingUser.withCpf(request.getCpf());
+        }
+
+        if (request.getUserType() != null && !request.getUserType().trim().isEmpty()) {
+            existingUser = existingUser.withUserType(UserType.valueOf(request.getUserType()));
+        }
+
+        if (request.getBirthDate() != null) {
+            existingUser = existingUser.withBirthDate(request.getBirthDate());
+        }
+
+        if (request.getStatus() != null && !request.getStatus().trim().isEmpty()) {
+            existingUser = existingUser.withStatus(UserStatus.valueOf(request.getStatus()));
+        }
+
+        if (request.getAddress() != null) {
+            Address updatedAddress = null;
+            if (request.getAddress().getId() != null) {
+                updatedAddress = addressService.updateAddress(request.getAddress());
+            } else {
+                updatedAddress = addressService.createAddress(request.getAddress());
+            }
             existingUser = existingUser.withAddress(updatedAddress);
         }
 

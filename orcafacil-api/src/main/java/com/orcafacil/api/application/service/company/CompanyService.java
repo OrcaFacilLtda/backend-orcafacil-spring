@@ -59,24 +59,33 @@ public class CompanyService {
         Company existingCompany = companyRepository.getByUserId(id)
                 .orElseThrow(() -> new RuntimeException("Empresa com o ID " + id + " não encontrada"));
 
-        String legalName = request.getLegalName() != null ? request.getLegalName() : existingCompany.getLegalName();
-        String cnpj = request.getCnpj() != null ? request.getCnpj() : existingCompany.getCnpj();
-
         Address updatedAddress = existingCompany.getAddress();
         if (request.getAddress() != null && request.getAddress().getId() != null) {
-            updatedAddress = addressService.updateAddress(request.getAddress().getId(), request.getAddress());
+            updatedAddress = addressService.updateAddress(request.getAddress());
         }
 
-        Company updatedCompany = new Company(
-                id,
-                legalName,
-                cnpj,
-                updatedAddress,
-                existingCompany.getCreatedAt()
-        );
+        String legalName;
+        if (request.getLegalName() != null) {
+            legalName = request.getLegalName();
+        } else {
+            legalName = existingCompany.getLegalName();
+        }
+
+        String cnpj;
+        if (request.getCnpj() != null) {
+            cnpj = request.getCnpj();
+        } else {
+            cnpj = existingCompany.getCnpj();
+        }
+
+        Company updatedCompany = existingCompany
+                .withLegalName(legalName)
+                .withCnpj(cnpj)
+                .withAddress(updatedAddress);
 
         return companyRepository.update(updatedCompany);
     }
+
 
     public void delete(Integer id) {
         if (id == null || id <= 0) {

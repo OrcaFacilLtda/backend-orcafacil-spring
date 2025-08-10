@@ -1,12 +1,11 @@
 package com.orcafacil.api.interfaceadapter.request.address;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public class AddressRequest {
 
-    @NotBlank(message = "id é obrigatório")
+    @NotNull(message = "ID é obrigatório")
+    @Min(value = 1, message = "ID deve ser maior que zero")
     private Integer id;
 
     @NotBlank(message = "Rua é obrigatória")

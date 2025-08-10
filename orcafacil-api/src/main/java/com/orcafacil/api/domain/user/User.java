@@ -126,9 +126,6 @@ public class User {
         }
     }
 
-    public boolean isActive() {
-        return this.status == UserStatus.APROVADO;
-    }
 
     public User withName(String newName) {
         return new User(id, newName, phone, email, password, cpf, userType, birthDate, status, address);

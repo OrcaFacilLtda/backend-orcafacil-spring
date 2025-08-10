@@ -17,7 +17,7 @@ public class Company {
     public Company(Integer id, String legalName, String cnpj, Address address, Date createdAt) {
         validateLegalName(legalName);
         validateCnpj(cnpj);
-        validateAndressId(address);
+        validateAddress(address);
 
         this.id = id;
         this.legalName = legalName;
@@ -25,7 +25,6 @@ public class Company {
         this.address = address;
         this.createdAt = createdAt != null ? new Date(createdAt.getTime()) : new Date();
     }
-
 
     private void validateLegalName(String legalName) {
         if (isNullOrEmpty(legalName)) {
@@ -37,13 +36,10 @@ public class Company {
         if (isNullOrEmpty(cnpj) || !cnpj.matches("\\d{14}")) {
             throw new DomainException("CNPJ inválido. Deve conter exatamente 14 dígitos numéricos.");
         }
-        if (!isValidCnpj(cnpj)) {
-            throw new DomainException("CNPJ inválido.");
-        }
     }
 
-    private void validateAndressId(Address andress) {
-        if (address == null ) {
+    private void validateAddress(Address address) {
+        if (address == null) {
             throw new DomainException("Endereço da empresa é obrigatório.");
         }
     }
@@ -52,31 +48,6 @@ public class Company {
         return value == null || value.trim().isEmpty();
     }
 
-
-    private boolean isValidCnpj(String cnpj) {
-        int[] weight1 = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-        int[] weight2 = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-
-        try {
-            int sum = 0;
-            for (int i = 0; i < 12; i++) {
-                sum += Character.getNumericValue(cnpj.charAt(i)) * weight1[i];
-            }
-            int mod = sum % 11;
-            char check1 = (mod < 2) ? '0' : (char) ((11 - mod) + '0');
-
-            sum = 0;
-            for (int i = 0; i < 13; i++) {
-                sum += Character.getNumericValue(cnpj.charAt(i)) * weight2[i];
-            }
-            mod = sum % 11;
-            char check2 = (mod < 2) ? '0' : (char) ((11 - mod) + '0');
-
-            return cnpj.charAt(12) == check1 && cnpj.charAt(13) == check2;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
 
     public Integer getId() {
@@ -99,6 +70,25 @@ public class Company {
         return new Date(createdAt.getTime());
     }
 
+    public Company withId(Integer newId) {
+        return new Company(newId, legalName, cnpj, address, createdAt);
+    }
+
+    public Company withLegalName(String newLegalName) {
+        return new Company(id, newLegalName, cnpj, address, createdAt);
+    }
+
+    public Company withCnpj(String newCnpj) {
+        return new Company(id, legalName, newCnpj, address, createdAt);
+    }
+
+    public Company withAddress(Address newAddress) {
+        return new Company(id, legalName, cnpj, newAddress, createdAt);
+    }
+
+    public Company withCreatedAt(Date newCreatedAt) {
+        return new Company(id, legalName, cnpj, address, newCreatedAt);
+    }
 
     @Override
     public boolean equals(Object o) {

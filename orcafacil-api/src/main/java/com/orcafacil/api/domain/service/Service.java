@@ -5,6 +5,7 @@ import com.orcafacil.api.domain.user.User;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 public final class Service {
     private final Integer id;
@@ -39,11 +40,11 @@ public final class Service {
         this.company = company;
         this.description = description;
         this.serviceStatus = serviceStatus;
-        this.requestDate = requestDate;
-        this.technicalVisitDate = technicalVisitDate;
+        this.requestDate = requestDate != null ? new Date(requestDate.getTime()) : null;
+        this.technicalVisitDate = technicalVisitDate != null ? new Date(technicalVisitDate.getTime()) : null;
         this.visitConfirmed = visitConfirmed;
-        this.negotiatedStartDate = negotiatedStartDate;
-        this.negotiatedEndDate = negotiatedEndDate;
+        this.negotiatedStartDate = negotiatedStartDate != null ? new Date(negotiatedStartDate.getTime()) : null;
+        this.negotiatedEndDate = negotiatedEndDate != null ? new Date(negotiatedEndDate.getTime()) : null;
         this.laborCost = laborCost;
         this.budgetFinalized = budgetFinalized;
     }
@@ -70,11 +71,11 @@ public final class Service {
     }
 
     public Date getRequestDate() {
-        return requestDate;
+        return requestDate != null ? new Date(requestDate.getTime()) : null;
     }
 
     public Date getTechnicalVisitDate() {
-        return technicalVisitDate;
+        return technicalVisitDate != null ? new Date(technicalVisitDate.getTime()) : null;
     }
 
     public Boolean getVisitConfirmed() {
@@ -82,11 +83,11 @@ public final class Service {
     }
 
     public Date getNegotiatedStartDate() {
-        return negotiatedStartDate;
+        return negotiatedStartDate != null ? new Date(negotiatedStartDate.getTime()) : null;
     }
 
     public Date getNegotiatedEndDate() {
-        return negotiatedEndDate;
+        return negotiatedEndDate != null ? new Date(negotiatedEndDate.getTime()) : null;
     }
 
     public BigDecimal getLaborCost() {
@@ -95,5 +96,81 @@ public final class Service {
 
     public Boolean getBudgetFinalized() {
         return budgetFinalized;
+    }
+
+    // Métodos with
+    public Service withUser(User newUser) {
+        return new Service(id, newUser, company, description, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withCompany(Company newCompany) {
+        return new Service(id, user, newCompany, description, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withDescription(String newDescription) {
+        return new Service(id, user, company, newDescription, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withServiceStatus(ServiceStatus newStatus) {
+        return new Service(id, user, company, description, newStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withRequestDate(Date newRequestDate) {
+        return new Service(id, user, company, description, serviceStatus,
+                newRequestDate != null ? new Date(newRequestDate.getTime()) : null,
+                technicalVisitDate, visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withTechnicalVisitDate(Date newTechnicalVisitDate) {
+        return new Service(id, user, company, description, serviceStatus,
+                requestDate,
+                newTechnicalVisitDate != null ? new Date(newTechnicalVisitDate.getTime()) : null,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withVisitConfirmed(Boolean newVisitConfirmed) {
+        return new Service(id, user, company, description, serviceStatus, requestDate, technicalVisitDate,
+                newVisitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withNegotiatedStartDate(Date newStartDate) {
+        return new Service(id, user, company, description, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed,
+                newStartDate != null ? new Date(newStartDate.getTime()) : null,
+                negotiatedEndDate, laborCost, budgetFinalized);
+    }
+
+    public Service withNegotiatedEndDate(Date newEndDate) {
+        return new Service(id, user, company, description, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate,
+                newEndDate != null ? new Date(newEndDate.getTime()) : null,
+                laborCost, budgetFinalized);
+    }
+
+    public Service withLaborCost(BigDecimal newLaborCost) {
+        return new Service(id, user, company, description, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, newLaborCost, budgetFinalized);
+    }
+
+    public Service withBudgetFinalized(Boolean newBudgetFinalized) {
+        return new Service(id, user, company, description, serviceStatus, requestDate, technicalVisitDate,
+                visitConfirmed, negotiatedStartDate, negotiatedEndDate, laborCost, newBudgetFinalized);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Service)) return false;
+        Service service = (Service) o;
+        return Objects.equals(id, service.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

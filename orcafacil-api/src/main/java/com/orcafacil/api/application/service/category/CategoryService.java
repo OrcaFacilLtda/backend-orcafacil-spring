@@ -30,14 +30,17 @@ public class CategoryService {
     }
 
     public Category update(Integer id, Category category) {
-        if (!categoryRepository.existsById(id)) {
-            throw new RuntimeException("Categoria não encontrada");
-        }
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
-        Category updatedCategory = new Category(id, category.getName(), category.getDescription());
+        Category updatedCategory = existingCategory
+                .withName(category.getName())
+                .withDescription(category.getDescription());
 
         return categoryRepository.update(updatedCategory);
     }
+
+
     public void delete(Integer id) {
         if (!categoryRepository.existsById(id)) {
             throw new RuntimeException("Categoria não encontrada");
