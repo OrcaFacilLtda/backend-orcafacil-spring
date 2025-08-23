@@ -21,14 +21,14 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
 
     List<ServiceEntity> findByCompanyId(Integer companyId);
 
-    List<ServiceEntity> findByServiceStatus(ServiceStatus status);
+    List<ServiceEntity> findByStatus(ServiceStatus status);
 
-    boolean existsByClientIdAndServiceStatus(Integer clientId, ServiceStatus status);
+    boolean existsByClientIdAndStatus(Integer clientId, ServiceStatus status);
 
-    boolean existsByCompanyIdAndServiceStatus(Integer companyId, ServiceStatus status);
+    boolean existsByCompanyIdAndStatus(Integer companyId, ServiceStatus status);
 
     @Modifying
-    @Query("UPDATE ServiceEntity s SET s.serviceStatus = :status WHERE s.id = :id")
+    @Query("UPDATE ServiceEntity s SET s.status = :status WHERE s.id = :id")
     void updateStatus(@Param("id") Integer id, @Param("status") ServiceStatus status);
 
     @Modifying

@@ -11,14 +11,16 @@ import java.util.Optional;
 public class JpaEvaluationRepositoryImpl implements EvaluationRepository {
 
     private final SpringEvaluationRepository repository;
+    private final EvaluationMapper mapper;
 
-    public JpaEvaluationRepositoryImpl(SpringEvaluationRepository repository) {
+    public JpaEvaluationRepositoryImpl(SpringEvaluationRepository repository, EvaluationMapper mapper) { // <-- Injeção
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public Optional<Evaluation> findByServiceId(Integer serviceId) {
         return repository.findByServiceId(serviceId)
-                .map(EvaluationMapper::toDomain);
+                .map(mapper::toDomain);
     }
 }

@@ -12,16 +12,18 @@ import java.util.stream.Collectors;
 public class JpaBudgetRevisionRequestRepositoryImpl implements BudgetRevisionRequestRepository {
 
     private final SpringBudgetRevisionRequestRepository repository;
+    private final BudgetRevisionRequestMapper mapper;
 
-    public JpaBudgetRevisionRequestRepositoryImpl(SpringBudgetRevisionRequestRepository repository) {
+    public JpaBudgetRevisionRequestRepositoryImpl(SpringBudgetRevisionRequestRepository repository, BudgetRevisionRequestMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public List<BudgetRevisionRequest> findByServiceId(Integer serviceId) {
         return repository.findByServiceId(serviceId)
                 .stream()
-                .map(BudgetRevisionRequestMapper::toDomain)
+                .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 }

@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 public class JpaVisitNegotiationRepositoryImpl implements VisitNegotiationRepository {
 
     private final SpringVisitNegotiationRepository repository;
+    private final VisitNegotiationMapper mapper;
 
-    public JpaVisitNegotiationRepositoryImpl(SpringVisitNegotiationRepository repository) {
+    public JpaVisitNegotiationRepositoryImpl(SpringVisitNegotiationRepository repository, VisitNegotiationMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -26,14 +28,14 @@ public class JpaVisitNegotiationRepositoryImpl implements VisitNegotiationReposi
     @Override
     public Optional<VisitNegotiation> findAcceptedByBothSides(Integer serviceId) {
         return repository.findAcceptedByBothSides(serviceId)
-                .map(VisitNegotiationMapper::toDomain);
+                .map(mapper::toDomain);
     }
 
     @Override
     public List<VisitNegotiation> findByServiceId(Integer serviceId) {
         return repository.findByServiceId(serviceId)
                 .stream()
-                .map(VisitNegotiationMapper::toDomain)
+                .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 }

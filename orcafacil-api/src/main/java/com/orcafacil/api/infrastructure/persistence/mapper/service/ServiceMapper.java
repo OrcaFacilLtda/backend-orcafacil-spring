@@ -1,18 +1,28 @@
 package com.orcafacil.api.infrastructure.persistence.mapper.service;
 
 import com.orcafacil.api.domain.service.Service;
-import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
+import com.orcafacil.api.infrastructure.persistence.mapper.company.CompanyMapper;
+import com.orcafacil.api.infrastructure.persistence.mapper.user.UserMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ServiceMapper {
 
     public ServiceEntity toEntity(Service service) {
+        if (service == null) {
+            return null;
+        }
+
         ServiceEntity entity = new ServiceEntity();
         entity.setId(service.getId());
-        entity.setClientId(service.getUser().getId());
-        entity.setCompanyId(service.getCompany().getId());
+        if (service.getUser() != null) {
+            entity.setClient(UserMapper.toEntity(service.getUser()));
+        }
+        if (service.getCompany() != null) {
+            entity.setCompany(CompanyMapper.toEntity(service.getCompany()));
+        }
+
         entity.setDescription(service.getDescription());
         entity.setStatus(service.getServiceStatus());
         entity.setRequestDate(service.getRequestDate());
@@ -27,16 +37,23 @@ public class ServiceMapper {
         entity.setNegotiatedEndDate(service.getNegotiatedEndDate());
         entity.setLaborCost(service.getLaborCost());
         entity.setBudgetFinalized(service.getBudgetFinalized());
+
         return entity;
     }
 
     public Service toDomain(ServiceEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        // A lógica de "hidratação" que implementamos no JpaServiceRepositoryImpl
+        // irá preencher os objetos User e Company posteriormente.
         return new Service(
                 entity.getId(),
-                null, // usuário será resolvido em outra camada
-                null, // empresa idem
+                null, // Será preenchido na camada de repositório
+                null, // Será preenchido na camada de repositório
                 entity.getDescription(),
-                entity.getStatus() != null ? entity.getStatus() : ServiceStatus.CREATED,
+                entity.getStatus(),
                 entity.getRequestDate(),
                 entity.getTechnicalVisitDate(),
                 entity.getClientVisitConfirmed(),

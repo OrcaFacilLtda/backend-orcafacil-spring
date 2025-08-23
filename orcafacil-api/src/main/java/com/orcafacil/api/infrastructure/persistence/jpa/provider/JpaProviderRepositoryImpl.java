@@ -4,7 +4,6 @@ import com.orcafacil.api.domain.provider.Provider;
 import com.orcafacil.api.domain.provider.ProviderRepository;
 import com.orcafacil.api.infrastructure.persistence.entity.provider.ProviderEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.provider.ProviderMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -14,7 +13,7 @@ public class JpaProviderRepositoryImpl implements ProviderRepository {
 
     private final SpringDataProviderRepository springDataProviderRepository;
 
-    @Autowired
+
     public JpaProviderRepositoryImpl(SpringDataProviderRepository springDataProviderRepository) {
         this.springDataProviderRepository = springDataProviderRepository;
     }

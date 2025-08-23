@@ -2,134 +2,67 @@ package com.orcafacil.api.interfaceadapter.controller;
 
 import com.orcafacil.api.application.service.service.BusinessServiceService;
 import com.orcafacil.api.domain.service.Service;
-
+import com.orcafacil.api.interfaceadapter.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/services")
 public class BusinessServiceController {
 
-    private final BusinessServiceService serviceService;
+    private final BusinessServiceService service;
 
-    public BusinessServiceController(BusinessServiceService serviceService) {
-        this.serviceService = serviceService;
+    public BusinessServiceController(BusinessServiceService service) {
+        this.service = service;
     }
 
-    // =============================
-    // Criar serviço
-    // =============================
     @PostMapping
-    public ResponseEntity<Service> createService(@RequestBody Service service) {
-        Service created = serviceService.create(service);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<Service>> create(@RequestBody Service serviceRequest) {
+        Service created = service.create(serviceRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(true, "Serviço criado com sucesso.", created));
     }
 
-    // =============================
-    // Consultar serviço
-    // =============================
     @GetMapping("/{id}")
-    public ResponseEntity<Service> getService(@PathVariable Integer id) {
-        return serviceService.findById(id)
-                .map(s -> ResponseEntity.ok(s))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<Service>> findById(@PathVariable Integer id) {
+        return service.findById(id)
+                .map(s -> ResponseEntity.ok(new ApiResponse<>(true, "Serviço encontrado.", s)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiResponse<>(false, "Serviço não encontrado.", null)));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Service>> getAllServices() {
-        return ResponseEntity.ok(serviceService.findAll());
-    }
-
-    // =============================
-    // Aceitar solicitação pelo prestador
-    // =============================
-    @PostMapping("/{id}/accept")
-    public ResponseEntity<Void> acceptService(@PathVariable Integer id) {
-        serviceService.acceptServiceRequest(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Confirmar visita técnica
-    // =============================
-    @PostMapping("/{id}/confirm-visit")
-    public ResponseEntity<Void> confirmVisit(@PathVariable Integer id) {
-        serviceService.confirmTechnicalVisit(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Propor datas da obra
-    // =============================
-    @PostMapping("/{id}/propose-dates")
-    public ResponseEntity<Void> proposeDates(@PathVariable Integer id,
-                                             @RequestParam Date start,
-                                             @RequestParam Date end) {
-        serviceService.proposeWorkDates(id, start, end);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Confirmar datas da obra
-    // =============================
-    @PostMapping("/{id}/confirm-dates")
-    public ResponseEntity<Void> confirmDates(@PathVariable Integer id) {
-        serviceService.confirmWorkDates(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Enviar lista de materiais
-    // =============================
-    @PostMapping("/{id}/materials")
-    public ResponseEntity<Void> sendMaterials(@PathVariable Integer id,
-                                              @RequestBody List<String> materials) {
-        serviceService.sendMaterialList(id, materials);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Confirmar materiais
-    // =============================
-    @PostMapping("/{id}/confirm-materials")
-    public ResponseEntity<Void> confirmMaterials(@PathVariable Integer id) {
-        serviceService.confirmMaterialList(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Solicitar nova lista de materiais
-    // =============================
-    @PostMapping("/{id}/request-new-materials")
-    public ResponseEntity<Void> requestNewMaterials(@PathVariable Integer id) {
-        serviceService.requestNewMaterialList(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Finalizar serviço com avaliação
-    // =============================
-    @PostMapping("/{id}/finalize")
-    public ResponseEntity<Void> finalizeService(@PathVariable Integer id,
-                                                @RequestParam int rating) {
-        serviceService.finalizeService(id, rating);
-        return ResponseEntity.ok().build();
-    }
-
-    // =============================
-    // Buscar serviços por usuário (ordenados)
-    // =============================
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Service>> getServicesByUser(@PathVariable Integer userId) {
-        return ResponseEntity.ok(serviceService.findByUserId(userId));
+    public ResponseEntity<ApiResponse<List<Service>>> findByUserId(@PathVariable Integer userId) {
+        List<Service> services = service.findByUserId(userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do usuário listados.", services));
     }
 
-    @GetMapping("/search/description/{description}")
-    public List<Service> searchByDescription(@PathVariable String description) {
-        return serviceService.getServicesByDescription(description);
+    // --- ENDPOINTS DE CONFIRMAÇÃO AJUSTADOS ---
+
+    @PostMapping("/{serviceId}/confirm-visit/{userId}")
+    public ResponseEntity<ApiResponse<Service>> confirmVisit(
+            @PathVariable Integer serviceId,
+            @PathVariable Integer userId) {
+        Service updated = service.confirmVisit(serviceId, userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Confirmação de visita registrada.", updated));
+    }
+
+    @PostMapping("/{serviceId}/confirm-dates/{userId}")
+    public ResponseEntity<ApiResponse<Service>> confirmDates(
+            @PathVariable Integer serviceId,
+            @PathVariable Integer userId) {
+        Service updated = service.confirmWorkDates(serviceId, userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Confirmação de datas registrada.", updated));
+    }
+
+    @PostMapping("/{serviceId}/confirm-materials/{userId}")
+    public ResponseEntity<ApiResponse<Service>> confirmMaterials(
+            @PathVariable Integer serviceId,
+            @PathVariable Integer userId) {
+        Service updated = service.confirmMaterials(serviceId, userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Confirmação de materiais registrada.", updated));
     }
 }

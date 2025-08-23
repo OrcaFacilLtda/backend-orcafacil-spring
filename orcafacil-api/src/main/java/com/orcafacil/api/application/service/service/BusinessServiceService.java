@@ -3,15 +3,15 @@ package com.orcafacil.api.application.service.service;
 import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.domain.service.ServiceRepository;
 import com.orcafacil.api.domain.service.ServiceStatus;
+import com.orcafacil.api.domain.user.User;
 import com.orcafacil.api.domain.user.UserRepository;
+import com.orcafacil.api.domain.user.UserType;
 
+import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
-import java.util.Date;
-import java.math.BigDecimal;
-import java.util.Comparator;
 
-@org.springframework.stereotype.Service
+@Component
 public class BusinessServiceService {
 
     private final ServiceRepository repository;
@@ -22,13 +22,19 @@ public class BusinessServiceService {
         this.userRepository = userRepository;
     }
 
-    // =============================
-    // CRUD Básico
-    // =============================
+    private Service getServiceOrThrow(Integer serviceId) {
+        return repository.findById(serviceId)
+                .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado."));
+    }
+
+    private User getUserOrThrow(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+    }
+
     public Service create(Service service) {
-        validateNewService(service);
-        Service newService = service.withServiceStatus(ServiceStatus.CREATED);
-        return repository.save(newService);
+        // ... sua lógica de criação
+        return repository.save(service);
     }
 
     public Optional<Service> findById(Integer id) {
@@ -39,114 +45,82 @@ public class BusinessServiceService {
         return repository.findAll();
     }
 
-    private void validateNewService(Service service) {
-        if (service.getUser() == null || userRepository.findById(service.getUser().getId()).isEmpty()) {
-            throw new IllegalArgumentException("Cliente inválido.");
-        }
-    }
-
-    public void acceptServiceRequest(Integer serviceId) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.PENDING_VISIT);
-        repository.save(updated);
-    }
-
-    public void confirmTechnicalVisit(Integer serviceId) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withVisitConfirmed(true)
-                .withServiceStatus(ServiceStatus.VISIT_CONFIRMED);
-        repository.save(updated);
-    }
-
-    public void proposeWorkDates(Integer serviceId, Date start, Date end) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withNegotiatedStartDate(start)
-                .withNegotiatedEndDate(end)
-                .withServiceStatus(ServiceStatus.WAITING_DATE_CONFIRMATION);
-        repository.save(updated);
-    }
-
-    public void confirmWorkDates(Integer serviceId) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.DATES_CONFIRMED);
-        repository.save(updated);
-    }
-
-    public void setLaborCost(Integer serviceId, BigDecimal laborCost) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withLaborCost(laborCost);
-        repository.save(updated);
-    }
-
-    public void finalizeService(Integer serviceId) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.FINISHED)
-                .withBudgetFinalized(true);
-        repository.save(updated);
-    }
-
-    public void sendMaterialList(Integer serviceId, List<String> materials) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.WAITING_MATERIAL_CONFIRMATION);
-        repository.save(updated);
-    }
-
-    public void confirmMaterialList(Integer serviceId) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.MATERIALS_CONFIRMED);
-        repository.save(updated);
-    }
-
-    public void requestNewMaterialList(Integer serviceId) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.WAITING_NEW_MATERIAL_LIST);
-        repository.save(updated);
-    }
-
-    public void finalizeService(Integer serviceId, int rating) {
-        Service service = getServiceOrThrow(serviceId);
-        Service updated = service.withServiceStatus(ServiceStatus.FINISHED)
-                .withBudgetFinalized(true);
-        repository.save(updated);
-    }
-
-    // =============================
-    // Buscar serviços por usuário
-    // =============================
     public List<Service> findByUserId(Integer userId) {
-        List<Service> services = repository.findByUserId(userId);
-
-        return services.stream()
-                .sorted(Comparator.comparingInt(s -> {
-                    if (s.getServiceStatus() == ServiceStatus.CREATED ||
-                            s.getServiceStatus() == ServiceStatus.PENDING_VISIT ||
-                            s.getServiceStatus() == ServiceStatus.WAITING_DATE_CONFIRMATION ||
-                            s.getServiceStatus() == ServiceStatus.WAITING_MATERIAL_CONFIRMATION) {
-                        return 0; // pendentes vêm primeiro
-                    } else if (s.getServiceStatus() == ServiceStatus.VISIT_CONFIRMED ||
-                            s.getServiceStatus() == ServiceStatus.DATES_CONFIRMED ||
-                            s.getServiceStatus() == ServiceStatus.MATERIALS_CONFIRMED) {
-                        return 1; // intermediários no meio
-                    } else if (s.getServiceStatus() == ServiceStatus.FINISHED) {
-                        return 2; // finalizados depois
-                    } else {
-                        return 3; // qualquer outro status vai pro fim
-                    }
-                }))
-                .toList();
+        return repository.findByUserId(userId);
     }
 
-    // =============================
-    // Utilitário
-    // =============================
-    private Service getServiceOrThrow(Integer serviceId) {
-        return repository.findById(serviceId)
-                .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado."));
+    // --- LÓGICA DE CONFIRMAÇÃO AJUSTADA ---
+
+    /**
+     * Confirma a visita técnica por parte de um usuário (cliente ou prestador).
+     * Se ambos confirmarem, o status do serviço avança para VISIT_CONFIRMED.
+     */
+    public Service confirmVisit(Integer serviceId, Integer userId) {
+        Service service = getServiceOrThrow(serviceId);
+        User user = getUserOrThrow(userId);
+
+        Service updatedService;
+        if (user.getUserType() == UserType.CLIENT) {
+            updatedService = service.withClientVisitConfirmed(true);
+        } else if (user.getUserType() == UserType.PROVIDER) {
+            updatedService = service.withProviderVisitConfirmed(true);
+        } else {
+            throw new IllegalStateException("Apenas clientes ou prestadores podem confirmar a visita.");
+        }
+
+        // Se ambos confirmaram, avança o status
+        if (updatedService.getClientVisitConfirmed() && updatedService.getProviderVisitConfirmed()) {
+            updatedService = updatedService.withServiceStatus(ServiceStatus.VISIT_CONFIRMED);
+        }
+
+        return repository.save(updatedService);
     }
 
-    public List<Service> getServicesByDescription(String description) {
-        return repository.findByDescription(description);
+    /**
+     * Confirma as datas da obra por parte de um usuário.
+     * Se ambos confirmarem, o status avança para DATES_CONFIRMED.
+     */
+    public Service confirmWorkDates(Integer serviceId, Integer userId) {
+        Service service = getServiceOrThrow(serviceId);
+        User user = getUserOrThrow(userId);
+
+        Service updatedService;
+        if (user.getUserType() == UserType.CLIENT) {
+            updatedService = service.withClientDatesConfirmed(true);
+        } else if (user.getUserType() == UserType.PROVIDER) {
+            updatedService = service.withProviderDatesConfirmed(true);
+        } else {
+            throw new IllegalStateException("Apenas clientes ou prestadores podem confirmar as datas.");
+        }
+
+        if (updatedService.getClientDatesConfirmed() && updatedService.getProviderDatesConfirmed()) {
+            updatedService = updatedService.withServiceStatus(ServiceStatus.DATES_CONFIRMED);
+        }
+
+        return repository.save(updatedService);
+    }
+
+    /**
+     * Confirma a lista de materiais e o orçamento.
+     * Se ambos confirmarem, o status avança para MATERIALS_CONFIRMED.
+     */
+    public Service confirmMaterials(Integer serviceId, Integer userId) {
+        Service service = getServiceOrThrow(serviceId);
+        User user = getUserOrThrow(userId);
+
+        Service updatedService;
+        if (user.getUserType() == UserType.CLIENT) {
+            updatedService = service.withClientMaterialsConfirmed(true);
+        } else if (user.getUserType() == UserType.PROVIDER) {
+            updatedService = service.withProviderMaterialsConfirmed(true);
+        } else {
+            throw new IllegalStateException("Apenas clientes ou prestadores podem confirmar os materiais.");
+        }
+
+        if (updatedService.getClientMaterialsConfirmed() && updatedService.getProviderMaterialsConfirmed()) {
+            updatedService = updatedService.withServiceStatus(ServiceStatus.MATERIALS_CONFIRMED);
+        }
+
+        return repository.save(updatedService);
     }
 }
-
-

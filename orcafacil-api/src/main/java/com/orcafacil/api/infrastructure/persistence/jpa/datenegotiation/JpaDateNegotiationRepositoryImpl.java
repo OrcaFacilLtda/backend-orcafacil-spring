@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 public class JpaDateNegotiationRepositoryImpl implements DateNegotiationRepository {
 
     private final SpringDateNegotiationRepository repository;
+    private final DateNegotiationMapper mapper;
 
-    public JpaDateNegotiationRepositoryImpl(SpringDateNegotiationRepository repository) {
+    public JpaDateNegotiationRepositoryImpl(SpringDateNegotiationRepository repository, DateNegotiationMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -26,14 +28,14 @@ public class JpaDateNegotiationRepositoryImpl implements DateNegotiationReposito
     @Override
     public Optional<DateNegotiation> findAcceptedByBothSides(Integer serviceId) {
         return repository.findAcceptedByBothSides(serviceId)
-                .map(DateNegotiationMapper::toDomain);
+                .map(mapper::toDomain);
     }
 
     @Override
     public List<DateNegotiation> findByServiceId(Integer serviceId) {
         return repository.findByServiceId(serviceId)
                 .stream()
-                .map(DateNegotiationMapper::toDomain)
+                .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 }

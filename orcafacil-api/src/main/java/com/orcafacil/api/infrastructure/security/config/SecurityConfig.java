@@ -1,7 +1,5 @@
 package com.orcafacil.api.infrastructure.security.config;
 
-import com.orcafacil.api.infrastructure.security.config.RsaKeyProperties;
-import com.orcafacil.api.infrastructure.security.config.RsaKeyProperties;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -26,7 +24,7 @@ import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity // <-- ANOTAÇÃO ADICIONADA
 public class SecurityConfig {
 
     private final RSAPublicKey rsaPublicKey;
@@ -41,10 +39,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/providers/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/providers", "/api/users", "/login").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

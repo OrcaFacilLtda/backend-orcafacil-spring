@@ -29,18 +29,35 @@ public class ServiceEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ServiceStatus serviceStatus;
+    private ServiceStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "request_date", nullable = false)
+    @Column(name = "request_date", nullable = false, updatable = false)
     private Date requestDate;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "technical_visit_date")
     private Date technicalVisitDate;
 
-    @Column(name = "visit_confirmed", nullable = false)
-    private Boolean visitConfirmed = false;
+    // --- CAMPOS DE CONFIRMAÇÃO BILATERAL ADICIONADOS ---
+    @Column(name = "client_visit_confirmed", nullable = false)
+    private Boolean clientVisitConfirmed = false;
+
+    @Column(name = "provider_visit_confirmed", nullable = false)
+    private Boolean providerVisitConfirmed = false;
+
+    @Column(name = "client_dates_confirmed", nullable = false)
+    private Boolean clientDatesConfirmed = false;
+
+    @Column(name = "provider_dates_confirmed", nullable = false)
+    private Boolean providerDatesConfirmed = false;
+
+    @Column(name = "client_materials_confirmed", nullable = false)
+    private Boolean clientMaterialsConfirmed = false;
+
+    @Column(name = "provider_materials_confirmed", nullable = false)
+    private Boolean providerMaterialsConfirmed = false;
+    // --- FIM DOS CAMPOS ADICIONADOS ---
 
     @Temporal(TemporalType.DATE)
     @Column(name = "negotiated_start_date")
@@ -56,30 +73,7 @@ public class ServiceEntity {
     @Column(name = "budget_finalized", nullable = false)
     private Boolean budgetFinalized = false;
 
-    // Construtor padrão necessário para JPA
-    public ServiceEntity() {}
-
-    // Construtor completo opcional
-    public ServiceEntity(Integer id, UserEntity client, CompanyEntity company, String description,
-                         ServiceStatus serviceStatus, Date requestDate, Date technicalVisitDate,
-                         Boolean visitConfirmed, Date negotiatedStartDate, Date negotiatedEndDate,
-                         BigDecimal laborCost, Boolean budgetFinalized) {
-        this.id = id;
-        this.client = client;
-        this.company = company;
-        this.description = description;
-        this.serviceStatus = serviceStatus;
-        this.requestDate = requestDate;
-        this.technicalVisitDate = technicalVisitDate;
-        this.visitConfirmed = visitConfirmed;
-        this.negotiatedStartDate = negotiatedStartDate;
-        this.negotiatedEndDate = negotiatedEndDate;
-        this.laborCost = laborCost;
-        this.budgetFinalized = budgetFinalized;
-    }
-
-    // Getters e setters para JPA
-
+    // Getters e Setters para todos os campos...
     public Integer getId() {
         return id;
     }
@@ -112,12 +106,12 @@ public class ServiceEntity {
         this.description = description;
     }
 
-    public ServiceStatus getServiceStatus() {
-        return serviceStatus;
+    public ServiceStatus getStatus() {
+        return status;
     }
 
-    public void setServiceStatus(ServiceStatus serviceStatus) {
-        this.serviceStatus = serviceStatus;
+    public void setStatus(ServiceStatus status) {
+        this.status = status;
     }
 
     public Date getRequestDate() {
@@ -136,12 +130,52 @@ public class ServiceEntity {
         this.technicalVisitDate = technicalVisitDate;
     }
 
-    public Boolean getVisitConfirmed() {
-        return visitConfirmed;
+    public Boolean getClientVisitConfirmed() {
+        return clientVisitConfirmed;
     }
 
-    public void setVisitConfirmed(Boolean visitConfirmed) {
-        this.visitConfirmed = visitConfirmed;
+    public void setClientVisitConfirmed(Boolean clientVisitConfirmed) {
+        this.clientVisitConfirmed = clientVisitConfirmed;
+    }
+
+    public Boolean getProviderVisitConfirmed() {
+        return providerVisitConfirmed;
+    }
+
+    public void setProviderVisitConfirmed(Boolean providerVisitConfirmed) {
+        this.providerVisitConfirmed = providerVisitConfirmed;
+    }
+
+    public Boolean getClientDatesConfirmed() {
+        return clientDatesConfirmed;
+    }
+
+    public void setClientDatesConfirmed(Boolean clientDatesConfirmed) {
+        this.clientDatesConfirmed = clientDatesConfirmed;
+    }
+
+    public Boolean getProviderDatesConfirmed() {
+        return providerDatesConfirmed;
+    }
+
+    public void setProviderDatesConfirmed(Boolean providerDatesConfirmed) {
+        this.providerDatesConfirmed = providerDatesConfirmed;
+    }
+
+    public Boolean getClientMaterialsConfirmed() {
+        return clientMaterialsConfirmed;
+    }
+
+    public void setClientMaterialsConfirmed(Boolean clientMaterialsConfirmed) {
+        this.clientMaterialsConfirmed = clientMaterialsConfirmed;
+    }
+
+    public Boolean getProviderMaterialsConfirmed() {
+        return providerMaterialsConfirmed;
+    }
+
+    public void setProviderMaterialsConfirmed(Boolean providerMaterialsConfirmed) {
+        this.providerMaterialsConfirmed = providerMaterialsConfirmed;
     }
 
     public Date getNegotiatedStartDate() {

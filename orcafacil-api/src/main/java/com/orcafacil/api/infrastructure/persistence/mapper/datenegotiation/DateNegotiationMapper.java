@@ -3,14 +3,22 @@ package com.orcafacil.api.infrastructure.persistence.mapper.datenegotiation;
 import com.orcafacil.api.domain.datenegotiation.DateNegotiation;
 import com.orcafacil.api.infrastructure.persistence.entity.datenegotiation.DateNegotiationEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
+import org.springframework.stereotype.Component;
 
+@Component // <-- Adicionado
 public class DateNegotiationMapper {
 
-    public static DateNegotiationEntity toEntity(DateNegotiation domain) {
+    private final ServiceMapper serviceMapper; // <-- Dependência
+
+    public DateNegotiationMapper(ServiceMapper serviceMapper) { // <-- Injeção
+        this.serviceMapper = serviceMapper;
+    }
+
+    public DateNegotiationEntity toEntity(DateNegotiation domain) { // <-- 'static' removido
         if (domain == null) return null;
         return new DateNegotiationEntity(
                 domain.getId(),
-                ServiceMapper.toEntity(domain.getService()),
+                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
                 domain.getPropeser(),
                 domain.getStartDate(),
                 domain.getEndDate(),
@@ -19,11 +27,11 @@ public class DateNegotiationMapper {
         );
     }
 
-    public static DateNegotiation toDomain(DateNegotiationEntity entity) {
+    public DateNegotiation toDomain(DateNegotiationEntity entity) { // <-- 'static' removido
         if (entity == null) return null;
         return new DateNegotiation(
                 entity.getId(),
-                ServiceMapper.toDomain(entity.getService()),
+                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
                 entity.getProposer(),
                 entity.getStartDate(),
                 entity.getEndDate(),

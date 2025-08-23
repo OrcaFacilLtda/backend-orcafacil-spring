@@ -2,17 +2,23 @@ package com.orcafacil.api.infrastructure.persistence.mapper.visitnegotiation;
 
 import com.orcafacil.api.domain.visitnegotiation.VisitNegotiation;
 import com.orcafacil.api.infrastructure.persistence.entity.visitnegotiation.VisitNegotiationEntity;
-import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper; // caso use
+import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VisitNegotiationMapper {
 
-    public static VisitNegotiationEntity toEntity(VisitNegotiation domain) {
+    private final ServiceMapper serviceMapper; // <-- Dependência
+
+    public VisitNegotiationMapper(ServiceMapper serviceMapper) { // <-- Injeção
+        this.serviceMapper = serviceMapper;
+    }
+
+    public VisitNegotiationEntity toEntity(VisitNegotiation domain) { // <-- 'static' removido
         if (domain == null) return null;
-
-
         return new VisitNegotiationEntity(
                 domain.getId(),
-                ServiceMapper.toEntity(domain.getService()),
+                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
                 domain.getPropeser(),
                 domain.getVisitDate(),
                 domain.getSentDate(),
@@ -20,12 +26,11 @@ public class VisitNegotiationMapper {
         );
     }
 
-    public static VisitNegotiation toDomain(VisitNegotiationEntity entity) {
+    public VisitNegotiation toDomain(VisitNegotiationEntity entity) { // <-- 'static' removido
         if (entity == null) return null;
-
         return new VisitNegotiation(
                 entity.getId(),
-                ServiceMapper.toDomain(entity.getService()),
+                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
                 entity.getProposer(),
                 entity.getVisitDate(),
                 entity.getSentDate(),

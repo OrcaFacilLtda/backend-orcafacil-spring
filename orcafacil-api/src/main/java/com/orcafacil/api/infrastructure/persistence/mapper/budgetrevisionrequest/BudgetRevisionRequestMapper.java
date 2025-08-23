@@ -4,24 +4,33 @@ import com.orcafacil.api.domain.budgetrevisionrequest.BudgetRevisionRequest;
 import com.orcafacil.api.infrastructure.persistence.entity.budgetrevisionrequest.BudgetRevisionRequestEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
 import com.orcafacil.api.infrastructure.persistence.mapper.user.UserMapper;
+import org.springframework.stereotype.Component;
 
+@Component // <-- Adicionado
 public class BudgetRevisionRequestMapper {
 
-    public static BudgetRevisionRequestEntity toEntity(BudgetRevisionRequest domain) {
+    private final ServiceMapper serviceMapper; // <-- Dependência
+    // UserMapper pode continuar static pois não tem dependências
+
+    public BudgetRevisionRequestMapper(ServiceMapper serviceMapper) { // <-- Injeção
+        this.serviceMapper = serviceMapper;
+    }
+
+    public BudgetRevisionRequestEntity toEntity(BudgetRevisionRequest domain) { // <-- 'static' removido
         if (domain == null) return null;
         return new BudgetRevisionRequestEntity(
                 domain.getId(),
-                ServiceMapper.toEntity(domain.getService()),
+                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
                 UserMapper.toEntity(domain.getClient()),
                 domain.getRequestDate()
         );
     }
 
-    public static BudgetRevisionRequest toDomain(BudgetRevisionRequestEntity entity) {
+    public BudgetRevisionRequest toDomain(BudgetRevisionRequestEntity entity) { // <-- 'static' removido
         if (entity == null) return null;
         return new BudgetRevisionRequest(
                 entity.getId(),
-                ServiceMapper.toDomain(entity.getService()),
+                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
                 UserMapper.toDomain(entity.getClient()),
                 entity.getRequestDate()
         );
