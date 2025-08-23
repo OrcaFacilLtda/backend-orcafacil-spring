@@ -28,9 +28,9 @@ public class UserMapper {
         return new User(
                 entity.getId(),
                 entity.getName(),
-                entity.getEmail(),
+                entity.getPhone(),           // ✅ Corrigido: estava sendo passado o email aqui
+                entity.getEmail(),           // ✅ Corrigido: estava sendo passado o phone aqui
                 entity.getPassword(),
-                entity.getPhone(),
                 entity.getCpf(),
                 entity.getUserType(),
                 entity.getBirthDate(),
@@ -50,8 +50,7 @@ public class UserMapper {
                 UserType.valueOf(request.getUserType().toUpperCase()),
                 request.getBirthDate(),
                 UserStatus.valueOf(request.getStatus().toUpperCase()),
-                AddressMapper.fromRequest(request.getAddress(),request.getAddress().getId())
+                AddressMapper.fromRequest(request.getAddress(), request.getAddress().getId())
         );
     }
-
 }

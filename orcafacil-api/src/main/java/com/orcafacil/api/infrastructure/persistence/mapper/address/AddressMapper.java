@@ -9,13 +9,13 @@ public class AddressMapper {
     public static AddressEntity toEntity(Address address) {
         return new AddressEntity(
                 address.getId(),
-                address.getZipCode(),
                 address.getStreet(),
                 address.getNumber(),
+                address.getComplement(),
                 address.getNeighborhood(),
                 address.getCity(),
                 address.getState(),
-                address.getComplement()
+                address.getZipCode()
         );
     }
 

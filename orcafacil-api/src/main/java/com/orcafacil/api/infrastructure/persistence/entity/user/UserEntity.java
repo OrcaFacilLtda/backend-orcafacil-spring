@@ -1,6 +1,5 @@
 package com.orcafacil.api.infrastructure.persistence.entity.user;
 
-import com.orcafacil.api.domain.address.Address;
 import com.orcafacil.api.domain.user.UserStatus;
 import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.infrastructure.persistence.entity.address.AddressEntity;

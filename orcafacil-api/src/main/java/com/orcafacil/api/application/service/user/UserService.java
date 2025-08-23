@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,14 +28,22 @@ public class UserService {
         this.validator = validator;
     }
 
+    @Transactional
     public User create(UserRequest request) {
+        // Validações do request
         Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Dados do usuário inválidos", violations);
         }
 
+        if (request.getAddress() == null) {
+            throw new IllegalArgumentException("Endereço é obrigatório para criar usuário.");
+        }
+
+        // Cria o endereço
         Address savedAddress = addressService.createAddress(request.getAddress());
 
+        // Cria o usuário
         User user = new User(
                 null,
                 request.getName(),
@@ -51,30 +60,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User create(UserRequest request, Address address) {
-        Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException("Dados do usuário inválidos", violations);
-        }
-
-        Address userAddress = address != null ? address : addressService.createAddress(request.getAddress());
-
-        User user = new User(
-                null,
-                request.getName(),
-                request.getPhone(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getCpf(),
-                UserType.valueOf(request.getUserType()),
-                request.getBirthDate(),
-                UserStatus.valueOf(request.getStatus()),
-                userAddress
-        );
-
-        return userRepository.save(user);
-    }
-
+    @Transactional
     public User update(Integer id, UserUpdateRequest request) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID do usuário inválido.");
@@ -117,7 +103,7 @@ public class UserService {
         }
 
         if (request.getAddress() != null) {
-            Address updatedAddress = null;
+            Address updatedAddress;
             if (request.getAddress().getId() != null) {
                 updatedAddress = addressService.updateAddress(request.getAddress());
             } else {
@@ -136,6 +122,7 @@ public class UserService {
         return userRepository.update(existingUser);
     }
 
+    @Transactional
     public void delete(Integer id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID do usuário inválido.");

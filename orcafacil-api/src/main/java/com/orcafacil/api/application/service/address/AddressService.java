@@ -66,7 +66,6 @@ public class AddressService {
             throw new IllegalArgumentException("ID inválido.");
         }
 
-        // Validação do Bean Validation no request
         Set<ConstraintViolation<AddressRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Dados do endereço inválidos", violations);
@@ -90,9 +89,10 @@ public class AddressService {
     }
 
     private void validateAddress(Address address) {
-        if (address.getZipCode() == null || !address.getZipCode().matches("\\d{8}")) {
+        if (address.getZipCode() == null || !address.getZipCode().trim().matches("\\d{8}")) {
             throw new IllegalArgumentException("CEP inválido. Deve conter exatamente 8 dígitos numéricos.");
         }
+
         if (address.getStreet() == null || address.getStreet().trim().isEmpty()) {
             throw new IllegalArgumentException("Rua não pode ser vazia.");
         }
@@ -112,7 +112,6 @@ public class AddressService {
             throw new IllegalArgumentException("Complemento não pode ter mais que 50 caracteres.");
         }
     }
-
 
     public void deleteAddress(Integer id) {
         if (id == null || id <= 0) {

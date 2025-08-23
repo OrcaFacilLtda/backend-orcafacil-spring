@@ -2,71 +2,53 @@ package com.orcafacil.api.infrastructure.persistence.jpa.service;
 
 import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.domain.service.ServiceRepository;
-import org.springframework.stereotype.Repository;
+import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
+import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
 
 import java.util.List;
 import java.util.Optional;
-
-import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
-
 import java.util.stream.Collectors;
 
-@Repository
+@org.springframework.stereotype.Repository
 public class JpaServiceRepositoryImpl implements ServiceRepository {
 
     private final SpringDataServiceRepository repository;
+    private final ServiceMapper mapper;
 
-    public JpaServiceRepositoryImpl(SpringDataServiceRepository repository) {
+    public JpaServiceRepositoryImpl(SpringDataServiceRepository repository, ServiceMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
-    public List<Service> findByClientId(Integer clientId) {
-        return repository.findByClientId(clientId)
-                .stream()
-                .map(ServiceMapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Service> findByCompanyId(Integer companyId) {
-        return repository.findByCompanyId(companyId)
-                .stream()
-                .map(ServiceMapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Service> findByStatus(String status) {
-        return repository.findByStatus(status)
-                .stream()
-                .map(ServiceMapper::toDomain)
-                .collect(Collectors.toList());
+    public Service save(Service service) {
+        ServiceEntity entity = mapper.toEntity(service);
+        return mapper.toDomain(repository.save(entity));
     }
 
     @Override
     public Optional<Service> findById(Integer id) {
-        return repository.findById(id)
-                .map(ServiceMapper::toDomain);
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
-    public boolean existsByClientIdAndStatus(Integer clientId, String status) {
-        return repository.existsByClientIdAndStatus(clientId, status);
+    public List<Service> findAll() {
+        return repository.findAll().stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public boolean existsByCompanyIdAndStatus(Integer companyId, String status) {
-        return repository.existsByCompanyIdAndStatus(companyId, status);
+    public void deleteById(Integer id) {
+
     }
 
     @Override
-    public void updateStatus(Integer id, String status) {
-        repository.updateStatus(id, status);
+    public List<Service> findByUserId(Integer userId) {
+        return repository.findByClientId(userId).stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public void confirmTechnicalVisit(Integer id) {
-        repository.confirmTechnicalVisit(id);
+    public List<Service> findByDescription(String description) {
+        return repository.findByDescriptionContainingIgnoreCase(description).stream()
+                .map(mapper::toDomain).collect(Collectors.toList());
     }
 }

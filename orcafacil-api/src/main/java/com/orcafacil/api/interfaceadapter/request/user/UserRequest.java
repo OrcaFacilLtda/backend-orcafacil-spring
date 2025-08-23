@@ -11,10 +11,8 @@ public class UserRequest {
     @Size(max = 100, message = "Nome não pode exceder 100 caracteres.")
     private String name;
 
-    @NotBlank(message = "Telefone é obrigatório.")
-    @Pattern(regexp = "\\d{10,}", message = "Telefone deve conter ao menos 10 dígitos numéricos.")
+    @Pattern(regexp = "\\s*\\d{10,}\\s*", message = "Telefone deve conter ao menos 10 dígitos numéricos.")
     private String phone;
-
 
     @NotBlank(message = "Email é obrigatório.")
     private String email;

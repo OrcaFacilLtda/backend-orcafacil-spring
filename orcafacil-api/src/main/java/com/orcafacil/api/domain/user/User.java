@@ -62,14 +62,18 @@ public class User {
     }
 
     private void validatePhone(String phone) {
+
         if (phone == null || phone.trim().isEmpty()) {
             throw new DomainException("Telefone é obrigatório.");
         }
-        String digits = phone.replaceAll("\\D", "");
+
+        String digits = phone.trim().replaceAll("\\D", "");
         if (digits.length() < 10) {
             throw new DomainException("Telefone deve conter ao menos 10 dígitos numéricos.");
         }
+
     }
+
 
     private void validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {

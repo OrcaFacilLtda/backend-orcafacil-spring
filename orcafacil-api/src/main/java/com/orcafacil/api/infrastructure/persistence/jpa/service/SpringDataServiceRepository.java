@@ -1,5 +1,6 @@
 package com.orcafacil.api.infrastructure.persistence.jpa.service;
 
+import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+
 @Repository
 public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity, Integer> {
 
@@ -19,17 +21,23 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
 
     List<ServiceEntity> findByCompanyId(Integer companyId);
 
-    List<ServiceEntity> findByStatus(String status);
+    List<ServiceEntity> findByServiceStatus(ServiceStatus status);
 
-    boolean existsByClientIdAndStatus(Integer clientId, String status);
+    boolean existsByClientIdAndServiceStatus(Integer clientId, ServiceStatus status);
 
-    boolean existsByCompanyIdAndStatus(Integer companyId, String status);
+    boolean existsByCompanyIdAndServiceStatus(Integer companyId, ServiceStatus status);
 
     @Modifying
-    @Query(value = "UPDATE service SET status = :status WHERE id = :id", nativeQuery = true)
-    void updateStatus(@Param("id") Integer id, @Param("status") String status);
+    @Query("UPDATE ServiceEntity s SET s.serviceStatus = :status WHERE s.id = :id")
+    void updateStatus(@Param("id") Integer id, @Param("status") ServiceStatus status);
 
     @Modifying
     @Query(value = "UPDATE service SET visit_confirmed = true, status = 'Visita Confirmada' WHERE id = :id", nativeQuery = true)
     void confirmTechnicalVisit(@Param("id") Integer id);
+
+    @Query("SELECT s FROM ServiceEntity s WHERE s.client.id = :userId OR s.company.id = :userId")
+    List<ServiceEntity> findByUserId(@Param("userId") Integer userId);
+
+    List<ServiceEntity> findByDescriptionContainingIgnoreCase(String description);
+
 }

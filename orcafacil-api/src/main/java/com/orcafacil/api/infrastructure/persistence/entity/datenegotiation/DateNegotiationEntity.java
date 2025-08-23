@@ -1,6 +1,6 @@
 package com.orcafacil.api.infrastructure.persistence.entity.datenegotiation;
 
-import com.orcafacil.api.domain.datenegotiation.Propeser;
+import com.orcafacil.api.domain.datenegotiation.Proposer;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
 import jakarta.persistence.*;
 
@@ -21,7 +21,7 @@ public class DateNegotiationEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "proposer", nullable = false)
-    private Propeser proposer;
+    private Proposer proposer;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "start_date", nullable = false)
@@ -40,7 +40,7 @@ public class DateNegotiationEntity {
     public DateNegotiationEntity() {
     }
 
-    public DateNegotiationEntity(Integer id, ServiceEntity service, Propeser proposer, Date startDate, Date endDate, LocalDateTime sentDate, Boolean accepted) {
+    public DateNegotiationEntity(Integer id, ServiceEntity service, Proposer proposer, Date startDate, Date endDate, LocalDateTime sentDate, Boolean accepted) {
         this.id = id;
         this.service = service;
         this.proposer = proposer;
@@ -66,9 +66,9 @@ public class DateNegotiationEntity {
 
     public void setService(ServiceEntity service) {this.service = service;}
 
-    public Propeser getProposer() {return proposer;}
+    public Proposer getProposer() {return proposer;}
 
-    public void setProposer(Propeser proposer) {this.proposer = proposer;}
+    public void setProposer(Proposer proposer) {this.proposer = proposer;}
 
     public Date getStartDate() {return startDate;}
 

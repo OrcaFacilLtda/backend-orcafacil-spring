@@ -4,8 +4,7 @@ import jakarta.validation.constraints.*;
 
 public class AddressRequest {
 
-    @NotNull(message = "ID é obrigatório")
-    @Min(value = 1, message = "ID deve ser maior que zero")
+
     private Integer id;
 
     @NotBlank(message = "Rua é obrigatória")
@@ -32,7 +31,6 @@ public class AddressRequest {
     private String state;
 
     @NotBlank(message = "CEP é obrigatório")
-    @Pattern(regexp = "\\d{8}", message = "CEP deve conter 8 dígitos")
     private String zipCode;
 
 

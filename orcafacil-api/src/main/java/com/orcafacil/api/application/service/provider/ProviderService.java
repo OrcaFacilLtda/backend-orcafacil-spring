@@ -42,7 +42,16 @@ public class ProviderService {
     @Transactional
     public Provider create(CreateProviderRequest request) {
         if (request.getCategoryId() == null) {
-            throw new IllegalArgumentException("Categoria inválida.");
+            throw new IllegalArgumentException("Categoria é obrigatória.");
+        }
+        if (request.getUserRequest() == null) {
+            throw new IllegalArgumentException("Usuário é obrigatório.");
+        }
+        if (request.getCompanyRequest() == null) {
+            throw new IllegalArgumentException("Companhia é obrigatória.");
+        }
+        if (request.getCompanyRequest().getAddress() == null) {
+            throw new IllegalArgumentException("Endereço da companhia é obrigatório.");
         }
 
         Category category = categoryService.findById(request.getCategoryId())
@@ -58,13 +67,13 @@ public class ProviderService {
             throw new IllegalArgumentException("CNPJ já cadastrado.");
         }
 
-        Address address = addressService.createAddress(request.getCompanyRequest().getAddress());
-        User user = userService.create(request.getUserRequest(), address);
+        User user = userService.create(request.getUserRequest());
         Company company = companyService.create(request.getCompanyRequest());
 
         Provider provider = new Provider(user, company, category);
         return repository.save(provider);
     }
+
 
     public Optional<Provider> findById(Integer id) {
         if (id == null || id <= 0) {

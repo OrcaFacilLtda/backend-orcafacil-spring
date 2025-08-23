@@ -8,13 +8,13 @@ import java.util.Date;
 public class DateNegotiation {
     private final Integer id;
     private final Service service;
-    private final Propeser propeser;
+    private final Proposer propeser;
     private final Date startDate;
     private final Date endDate;
     private  final LocalDateTime sentDate;
     private final Boolean accepted;
 
-    public DateNegotiation(Integer id, Service service, Propeser propeser, Date startDate, Date endDate, LocalDateTime sentDate, Boolean accepted) {
+    public DateNegotiation(Integer id, Service service, Proposer propeser, Date startDate, Date endDate, LocalDateTime sentDate, Boolean accepted) {
         this.id = id;
         this.service = service;
         this.propeser = propeser;
@@ -28,7 +28,7 @@ public class DateNegotiation {
 
     public Service getService() {return service;}
 
-    public Propeser getPropeser() {return propeser;}
+    public Proposer getPropeser() {return propeser;}
 
     public Date getStartDate() {return startDate;}
 
@@ -43,7 +43,7 @@ public class DateNegotiation {
         return new DateNegotiation(id,newService,propeser,startDate,endDate,sentDate,accepted);
     }
 
-    public DateNegotiation withPropeser(Propeser newProposer){
+    public DateNegotiation withPropeser(Proposer newProposer){
         return new DateNegotiation(id,service,newProposer,startDate,endDate,sentDate,accepted);
     }
 

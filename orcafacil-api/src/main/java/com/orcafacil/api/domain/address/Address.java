@@ -16,7 +16,8 @@ public class Address {
 
     public Address(Integer id, String zipCode, String street, String number,
                    String neighborhood, String city, String state, String complement) {
-        validateZipCode(zipCode);
+        String cleanZip = validateZipCode(zipCode);
+
         validateStreet(street);
         validateNumber(number);
         validateNeighborhood(neighborhood);
@@ -25,7 +26,7 @@ public class Address {
         validateComplement(complement);
 
         this.id = id;
-        this.zipCode = zipCode;
+        this.zipCode = cleanZip;
         this.street = street;
         this.number = number;
         this.neighborhood = neighborhood;
@@ -34,10 +35,19 @@ public class Address {
         this.complement = complement;
     }
 
-    private void validateZipCode(String zipCode) {
-        if (isNullOrEmpty(zipCode) || !zipCode.matches("\\d{8}")) {
+    private String validateZipCode(String zipCode) {
+        if (isNullOrEmpty(zipCode)) {
+            throw new DomainException("CEP é obrigatório.");
+        }
+
+        // Remove todos os caracteres que não são dígitos (ex: hífen, espaço, etc)
+        String cleanZip = zipCode.replaceAll("\\D", "");
+
+        if (!cleanZip.matches("\\d{8}")) {
             throw new DomainException("CEP inválido. Deve conter exatamente 8 dígitos numéricos.");
         }
+
+        return cleanZip;
     }
 
     private void validateStreet(String street) {
@@ -112,6 +122,7 @@ public class Address {
         return complement;
     }
 
+    // Métodos with* para imutabilidade
     public Address withId(Integer newId) {
         return new Address(newId, zipCode, street, number, neighborhood, city, state, complement);
     }

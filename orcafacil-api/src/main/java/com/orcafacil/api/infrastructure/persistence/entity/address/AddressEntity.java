@@ -39,7 +39,7 @@ public class AddressEntity {
     private String zipCode;
 
     public AddressEntity(Integer id, String street, String number, String complement,
-                         String neighborhood, String city, String state, String zipCode) {
+                         String neighborhood, String city, String state, String zipCode){
         this.id = id;
         this.street = street;
         this.number = number;
