@@ -22,33 +22,38 @@ public class JpaServiceRepositoryImpl implements ServiceRepository {
 
     @Override
     public Service save(Service service) {
-        ServiceEntity entity = mapper.toEntity(service);
-        return mapper.toDomain(repository.save(entity));
+        ServiceEntity entity = mapper
+                .toEntity(service);
+        return mapper
+                .toDomain(repository.save(entity));
     }
 
     @Override
     public Optional<Service> findById(Integer id) {
-        return repository.findById(id).map(mapper::toDomain);
+        return repository
+                .findById(id)
+                .map(mapper::toDomain);
     }
 
     @Override
     public List<Service> findAll() {
-        return repository.findAll().stream().map(mapper::toDomain).collect(Collectors.toList());
+        return repository.findAll()
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteById(Integer id) {
-
-    }
+    public void deleteById(Integer id) {}
 
     @Override
     public List<Service> findByUserId(Integer userId) {
-        return repository.findByClientId(userId).stream().map(mapper::toDomain).collect(Collectors.toList());
+        return repository
+                .findByClientId(userId)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public List<Service> findByDescription(String description) {
-        return repository.findByDescriptionContainingIgnoreCase(description).stream()
-                .map(mapper::toDomain).collect(Collectors.toList());
-    }
+
 }

@@ -1,29 +1,43 @@
 package com.orcafacil.api.application.service.service;
 
+import com.orcafacil.api.domain.budgetrevisionrequest.BudgetRevisionRequest;
+import com.orcafacil.api.domain.budgetrevisionrequest.BudgetRevisionRequestRepository;
+import com.orcafacil.api.domain.evaluation.Evaluation;
+import com.orcafacil.api.domain.evaluation.EvaluationRepository;
 import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.domain.service.ServiceRepository;
 import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.domain.user.User;
 import com.orcafacil.api.domain.user.UserRepository;
 import com.orcafacil.api.domain.user.UserType;
+import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@org.springframework.stereotype.Service // <-- Alterado de @Component para @Service para maior clareza semântica
 public class BusinessServiceService {
 
-    private final ServiceRepository repository;
+    private final ServiceRepository serviceRepository;
     private final UserRepository userRepository;
+    private final BudgetRevisionRequestRepository revisionRequestRepository;
+    private final EvaluationRepository evaluationRepository;
 
-    public BusinessServiceService(ServiceRepository repository, UserRepository userRepository) {
-        this.repository = repository;
+    // Construtor atualizado com todas as dependências
+    public BusinessServiceService(
+            ServiceRepository serviceRepository,
+            UserRepository userRepository,
+            BudgetRevisionRequestRepository revisionRequestRepository,
+            EvaluationRepository evaluationRepository) {
+        this.serviceRepository = serviceRepository;
         this.userRepository = userRepository;
+        this.revisionRequestRepository = revisionRequestRepository;
+        this.evaluationRepository = evaluationRepository;
     }
 
     private Service getServiceOrThrow(Integer serviceId) {
-        return repository.findById(serviceId)
+        return serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado."));
     }
 
@@ -32,29 +46,73 @@ public class BusinessServiceService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
     }
 
+    // --- MÉTODOS CRUD E DE BUSCA ---
+
+    @Transactional
     public Service create(Service service) {
-        // ... sua lógica de criação
-        return repository.save(service);
+        Service newService = service.withServiceStatus(ServiceStatus.REQUEST_SENT);
+        return serviceRepository.save(newService);
     }
 
     public Optional<Service> findById(Integer id) {
-        return repository.findById(id);
+        return serviceRepository.findById(id);
     }
 
     public List<Service> findAll() {
-        return repository.findAll();
+        return serviceRepository.findAll();
     }
 
     public List<Service> findByUserId(Integer userId) {
-        return repository.findByUserId(userId);
+        return serviceRepository.findByUserId(userId);
     }
 
-    // --- LÓGICA DE CONFIRMAÇÃO AJUSTADA ---
+    // --- LÓGICA DE NEGÓCIO DO FLUXO DE SERVIÇO ---
 
-    /**
-     * Confirma a visita técnica por parte de um usuário (cliente ou prestador).
-     * Se ambos confirmarem, o status do serviço avança para VISIT_CONFIRMED.
-     */
+    @Transactional
+    public Service rejectService(Integer serviceId, Integer providerId) {
+        Service service = getServiceOrThrow(serviceId);
+        if (!service.getCompany().getId().equals(providerId)) {
+            throw new IllegalStateException("Apenas o prestador de serviço responsável pode recusar a solicitação.");
+        }
+        Service updatedService = service.withServiceStatus(ServiceStatus.REJECTED);
+        return serviceRepository.save(updatedService);
+    }
+
+    @Transactional
+    public Service requestBudgetRevision(Integer serviceId, Integer clientId) {
+        Service service = getServiceOrThrow(serviceId);
+        User client = getUserOrThrow(clientId);
+
+        if (!service.getUser().getId().equals(clientId)) {
+            throw new IllegalStateException("Apenas o cliente responsável pode solicitar a revisão.");
+        }
+
+        BudgetRevisionRequest revisionRequest = new BudgetRevisionRequest(null, service, client, LocalDateTime.now());
+        revisionRequestRepository.save(revisionRequest);
+
+        Service updatedService = service.withServiceStatus(ServiceStatus.BUDGET_REVISION_REQUESTED);
+        return serviceRepository.save(updatedService);
+    }
+
+    @Transactional
+    public Service finalizeAndEvaluate(Integer serviceId, Integer clientId, int stars) {
+        Service service = getServiceOrThrow(serviceId);
+        User client = getUserOrThrow(clientId);
+
+        if (!service.getUser().getId().equals(clientId)) {
+            throw new IllegalStateException("Apenas o cliente do serviço pode finalizá-lo e avaliá-lo.");
+        }
+
+        Evaluation evaluation = new Evaluation(null, service, stars, LocalDateTime.now());
+        evaluationRepository.save(evaluation);
+
+        Service updatedService = service.withServiceStatus(ServiceStatus.COMPLETED);
+        return serviceRepository.save(updatedService);
+    }
+
+    // --- MÉTODOS DE CONFIRMAÇÃO BILATERAL ---
+
+    @Transactional
     public Service confirmVisit(Integer serviceId, Integer userId) {
         Service service = getServiceOrThrow(serviceId);
         User user = getUserOrThrow(userId);
@@ -68,18 +126,14 @@ public class BusinessServiceService {
             throw new IllegalStateException("Apenas clientes ou prestadores podem confirmar a visita.");
         }
 
-        // Se ambos confirmaram, avança o status
         if (updatedService.getClientVisitConfirmed() && updatedService.getProviderVisitConfirmed()) {
             updatedService = updatedService.withServiceStatus(ServiceStatus.VISIT_CONFIRMED);
         }
 
-        return repository.save(updatedService);
+        return serviceRepository.save(updatedService);
     }
 
-    /**
-     * Confirma as datas da obra por parte de um usuário.
-     * Se ambos confirmarem, o status avança para DATES_CONFIRMED.
-     */
+    @Transactional
     public Service confirmWorkDates(Integer serviceId, Integer userId) {
         Service service = getServiceOrThrow(serviceId);
         User user = getUserOrThrow(userId);
@@ -97,13 +151,10 @@ public class BusinessServiceService {
             updatedService = updatedService.withServiceStatus(ServiceStatus.DATES_CONFIRMED);
         }
 
-        return repository.save(updatedService);
+        return serviceRepository.save(updatedService);
     }
 
-    /**
-     * Confirma a lista de materiais e o orçamento.
-     * Se ambos confirmarem, o status avança para MATERIALS_CONFIRMED.
-     */
+    @Transactional
     public Service confirmMaterials(Integer serviceId, Integer userId) {
         Service service = getServiceOrThrow(serviceId);
         User user = getUserOrThrow(userId);
@@ -118,9 +169,9 @@ public class BusinessServiceService {
         }
 
         if (updatedService.getClientMaterialsConfirmed() && updatedService.getProviderMaterialsConfirmed()) {
-            updatedService = updatedService.withServiceStatus(ServiceStatus.MATERIALS_CONFIRMED);
+            updatedService = updatedService.withServiceStatus(ServiceStatus.IN_PROGRESS); // Orçamento aprovado, serviço em execução
         }
 
-        return repository.save(updatedService);
+        return serviceRepository.save(updatedService);
     }
 }

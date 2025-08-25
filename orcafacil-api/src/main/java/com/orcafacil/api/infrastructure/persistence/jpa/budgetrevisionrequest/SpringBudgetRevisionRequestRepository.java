@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface SpringBudgetRevisionRequestRepository extends JpaRepository<BudgetRevisionRequestEntity, Integer> {
     List<BudgetRevisionRequestEntity> findByServiceId(Integer serviceId);
+
 }

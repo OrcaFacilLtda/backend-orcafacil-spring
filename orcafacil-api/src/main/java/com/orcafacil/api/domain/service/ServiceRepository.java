@@ -15,6 +15,5 @@ public interface ServiceRepository {
 
     List<Service> findByUserId(Integer userId);
 
-    List<Service> findByDescription(String description);
 
 }

@@ -13,15 +13,17 @@ public class WebCorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // ou defina domínios específicos
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // só true se precisar de cookies/autenticação
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        CorsConfiguration config = new CorsConfiguration();
 
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        config.setAllowCredentials(true);
+
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 }

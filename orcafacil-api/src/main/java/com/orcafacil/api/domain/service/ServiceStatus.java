@@ -1,13 +1,14 @@
 package com.orcafacil.api.domain.service;
 
 public enum ServiceStatus {
-    CREATED,                        // Solicitação criada
-    PENDING_VISIT,                   // Aguardando confirmação de visita técnica
-    VISIT_CONFIRMED,                 // Visita técnica confirmada por ambos
-    WAITING_DATE_CONFIRMATION,       // Aguardando confirmação das datas da obra
-    DATES_CONFIRMED,                 // Datas da obra confirmadas por ambos
-    WAITING_MATERIAL_CONFIRMATION,   // Aguardando confirmação da lista de materiais pelo cliente
-    MATERIALS_CONFIRMED,             // Lista de materiais confirmada pelo cliente
-    WAITING_NEW_MATERIAL_LIST,       // Cliente solicitou nova lista de materiais
-    FINISHED                         // Serviço finalizado e avaliado
+    REQUEST_SENT,               // Cliente enviou a solicitação
+    REJECTED,                   // Prestador recusou a solicitação
+    NEGOTIATING_VISIT,          // Em negociação da visita (aguardando confirmação de ambos)
+    VISIT_CONFIRMED,            // Visita confirmada por ambos
+    NEGOTIATING_DATES,          // Em negociação das datas (aguardando confirmação de ambos)
+    DATES_CONFIRMED,            // Datas da obra confirmadas por ambos
+    BUDGET_IN_NEGOTIATION,      // Orçamento enviado, aguardando aceite ou revisão do cliente
+    BUDGET_REVISION_REQUESTED,  // Cliente pediu revisão do orçamento
+    IN_PROGRESS,                // Orçamento aprovado, serviço em execução
+    COMPLETED                   // Serviço concluído e avaliado
 }

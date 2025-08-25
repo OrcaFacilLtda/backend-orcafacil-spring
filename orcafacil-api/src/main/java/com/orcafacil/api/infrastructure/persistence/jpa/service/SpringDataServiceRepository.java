@@ -11,9 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-
 @Repository
 public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity, Integer> {
 
@@ -37,7 +34,5 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
 
     @Query("SELECT s FROM ServiceEntity s WHERE s.client.id = :userId OR s.company.id = :userId")
     List<ServiceEntity> findByUserId(@Param("userId") Integer userId);
-
-    List<ServiceEntity> findByDescriptionContainingIgnoreCase(String description);
 
 }
