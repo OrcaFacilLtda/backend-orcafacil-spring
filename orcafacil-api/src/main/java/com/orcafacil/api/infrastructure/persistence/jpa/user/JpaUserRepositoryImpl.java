@@ -3,6 +3,7 @@ package com.orcafacil.api.infrastructure.persistence.jpa.user;
 import com.orcafacil.api.domain.user.User;
 import com.orcafacil.api.domain.user.UserRepository;
 import com.orcafacil.api.domain.user.UserStatus;
+import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.infrastructure.persistence.entity.user.UserEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,4 +82,14 @@ public class JpaUserRepositoryImpl implements UserRepository {
                 .findByCpf(cpf)
                 .map(UserMapper::toDomain);
     }
+
+    @Override
+    public List<User> findByTypeAndStatus(UserType type, UserStatus status) {
+        return springDataUserRepository.findByUserTypeAndStatus(type, status)
+                .stream()
+                .map(UserMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+
 }

@@ -1,20 +1,22 @@
 package com.orcafacil.api.application.service.provider;
 
-import com.orcafacil.api.application.service.address.AddressService;
 import com.orcafacil.api.application.service.company.CompanyService;
 import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.application.service.category.CategoryService;
-import com.orcafacil.api.domain.address.Address;
 import com.orcafacil.api.domain.company.Company;
 import com.orcafacil.api.domain.provider.Provider;
 import com.orcafacil.api.domain.provider.ProviderRepository;
 import com.orcafacil.api.domain.user.User;
 import com.orcafacil.api.domain.category.Category;
+import com.orcafacil.api.domain.user.UserStatus;
+import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.interfaceadapter.request.provider.CreateProviderRequest;
 import com.orcafacil.api.interfaceadapter.request.provider.UpdateProviderRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,20 +24,17 @@ public class ProviderService {
     private final ProviderRepository repository;
     private final CompanyService companyService;
     private final UserService userService;
-    private final AddressService addressService;
     private final CategoryService categoryService;
 
     public ProviderService(
             ProviderRepository repository,
             CompanyService companyService,
             UserService userService,
-            AddressService addressService,
             CategoryService categoryService
     ) {
         this.repository = repository;
         this.companyService = companyService;
         this.userService = userService;
-        this.addressService = addressService;
         this.categoryService = categoryService;
     }
 
@@ -133,6 +132,18 @@ public class ProviderService {
                 .withCategory(updatedCategory);
 
         return repository.save(updatedProvider);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Provider> findAllActive() {
+        List<User> activeProviderUsers = userService
+                .findByTypeAndStatus(UserType.PROVIDER, UserStatus.APPROVED);
+
+        if (activeProviderUsers.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return repository.findAllByUserIn(activeProviderUsers);
     }
 
 }

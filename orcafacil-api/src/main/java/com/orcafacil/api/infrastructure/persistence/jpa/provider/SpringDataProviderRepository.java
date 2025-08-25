@@ -1,17 +1,20 @@
 package com.orcafacil.api.infrastructure.persistence.jpa.provider;
 
 import com.orcafacil.api.infrastructure.persistence.entity.provider.ProviderEntity;
+import com.orcafacil.api.infrastructure.persistence.entity.user.UserEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface SpringDataProviderRepository extends JpaRepository<ProviderEntity, Integer> {
     Optional<ProviderEntity> findByCompanyId(Integer companyId);
+
 
     @Modifying
     @Transactional
@@ -20,5 +23,8 @@ public interface SpringDataProviderRepository extends JpaRepository<ProviderEnti
 
     @Override
     boolean existsById(Integer integer);
+
+    List<ProviderEntity> findByUserIn(List<UserEntity> users);
+
 }
 

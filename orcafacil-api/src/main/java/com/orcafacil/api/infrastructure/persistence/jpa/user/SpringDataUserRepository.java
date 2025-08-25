@@ -40,4 +40,8 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, Inte
             @Param("status") UserStatus status,
             @Param("addressId") Integer addressId
     );
+
+    List<UserEntity> findByUserTypeAndStatus(UserType userType, UserStatus status);
+
 }
+

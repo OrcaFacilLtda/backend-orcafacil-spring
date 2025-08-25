@@ -190,4 +190,12 @@ public class UserService {
         }
         return userRepository.findByCpf(cpf).isPresent();
     }
+
+    @Transactional(readOnly = true)
+    public List<User> findByTypeAndStatus(UserType type, UserStatus status) {
+        if (type == null || status == null) {
+            throw new IllegalArgumentException("Tipo e Status não podem ser nulos.");
+        }
+        return userRepository.findByTypeAndStatus(type, status);
+    }
 }

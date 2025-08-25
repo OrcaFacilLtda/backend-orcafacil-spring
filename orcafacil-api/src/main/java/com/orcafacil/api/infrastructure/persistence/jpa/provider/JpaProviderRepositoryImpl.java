@@ -2,11 +2,16 @@ package com.orcafacil.api.infrastructure.persistence.jpa.provider;
 
 import com.orcafacil.api.domain.provider.Provider;
 import com.orcafacil.api.domain.provider.ProviderRepository;
+import com.orcafacil.api.domain.user.User;
 import com.orcafacil.api.infrastructure.persistence.entity.provider.ProviderEntity;
+import com.orcafacil.api.infrastructure.persistence.entity.user.UserEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.provider.ProviderMapper;
+import com.orcafacil.api.infrastructure.persistence.mapper.user.UserMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class JpaProviderRepositoryImpl implements ProviderRepository {
@@ -50,5 +55,17 @@ public class JpaProviderRepositoryImpl implements ProviderRepository {
     @Override
     public boolean existsById(Integer id) {
         return  springDataProviderRepository.existsById(id);
+    }
+
+    @Override
+    public List<Provider> findAllByUserIn(List<User> users) {
+        List<UserEntity> userEntities = users.stream()
+                .map(UserMapper::toEntity)
+                .collect(Collectors.toList());
+
+        return springDataProviderRepository.findByUserIn(userEntities)
+                .stream()
+                .map(ProviderMapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

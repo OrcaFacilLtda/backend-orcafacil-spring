@@ -34,5 +34,18 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
 
     @Query("SELECT s FROM ServiceEntity s WHERE s.client.id = :userId OR s.company.id = :userId")
     List<ServiceEntity> findByUserId(@Param("userId") Integer userId);
+    long countByCompanyId(Integer companyId);
+
+    long countByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses);
+
+    @Query("SELECT AVG(e.stars) FROM EvaluationEntity e WHERE e.service.company.id = :companyId")
+    Double findAverageRatingByCompanyId(@Param("companyId") Integer companyId);
+
+    List<ServiceEntity> findByCompanyIdAndStatus(Integer companyId, ServiceStatus status);
+
+    List<ServiceEntity> findByCompanyIdAndStatusIn(Integer companyId, List<ServiceStatus> statuses);
+
+    @Query("SELECT s FROM ServiceEntity s WHERE s.company.id = :companyId AND s.status IN :statuses AND FUNCTION('DATE', s.requestDate) = CURRENT_DATE")
+    List<ServiceEntity> findByCompanyIdAndStatusInAndDate(@Param("companyId") Integer companyId, @Param("statuses") List<ServiceStatus> statuses);
 
 }

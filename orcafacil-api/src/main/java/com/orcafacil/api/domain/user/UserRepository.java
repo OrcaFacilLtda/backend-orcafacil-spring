@@ -13,4 +13,6 @@ public interface UserRepository {
     List<User> findAll();
     Optional<User> findByEmail(String email);
     Optional<User> findByCpf(String cpf);
+    List<User> findByTypeAndStatus(UserType type, UserStatus status);
+
 }

@@ -1,7 +1,8 @@
 package com.orcafacil.api.domain.provider;
 
-import com.orcafacil.api.domain.category.Category;
+import com.orcafacil.api.domain.user.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProviderRepository {
@@ -11,5 +12,7 @@ public interface ProviderRepository {
     void deleteById(Integer id);
     Provider update(Provider provider);
     boolean existsById(Integer id);
+
+    List<Provider> findAllByUserIn(List<User> users);
 
 }
