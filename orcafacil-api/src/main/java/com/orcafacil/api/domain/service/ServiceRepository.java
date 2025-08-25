@@ -14,6 +14,11 @@ public interface ServiceRepository {
     void deleteById(Integer id);
 
     List<Service> findByUserId(Integer userId);
-
+    long countByCompanyId(Integer companyId);
+    long countByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses);
+    Double findAverageRatingByCompanyId(Integer companyId);
+    List<Service> findByCompanyIdAndStatus(Integer companyId, ServiceStatus status);
+    List<Service> findByCompanyIdAndStatusIn(Integer companyId, List<ServiceStatus> statuses);
+    List<Service> findAcceptedTodayByCompanyId(Integer companyId, List<ServiceStatus> statuses);
 
 }

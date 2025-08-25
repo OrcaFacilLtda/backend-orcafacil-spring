@@ -65,4 +65,22 @@ public class BusinessServiceController {
         Service updated = service.confirmMaterials(serviceId, userId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Confirmação de materiais registrada.", updated));
     }
+
+
+    @PostMapping("/{serviceId}/provider/{providerId}/accept")
+    public ResponseEntity<ApiResponse<Service>> acceptService(
+            @PathVariable Integer serviceId,
+            @PathVariable Integer providerId) {
+        Service updatedService = service.acceptService(serviceId, providerId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Serviço aceito com sucesso.", updatedService));
+    }
+
+    @PostMapping("/{serviceId}/provider/{providerId}/reject")
+    public ResponseEntity<ApiResponse<Service>> rejectService(
+            @PathVariable Integer serviceId,
+            @PathVariable Integer providerId) {
+        Service updatedService = service.rejectService(serviceId, providerId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Serviço recusado com sucesso.", updatedService));
+    }
+
 }

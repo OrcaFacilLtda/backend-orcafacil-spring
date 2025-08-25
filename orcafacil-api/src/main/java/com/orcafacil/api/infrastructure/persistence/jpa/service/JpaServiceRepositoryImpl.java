@@ -2,6 +2,7 @@ package com.orcafacil.api.infrastructure.persistence.jpa.service;
 
 import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.domain.service.ServiceRepository;
+import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
 
@@ -55,5 +56,43 @@ public class JpaServiceRepositoryImpl implements ServiceRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public long countByCompanyId(Integer companyId) {
+        return repository.countByCompanyId(companyId);
+    }
+
+    @Override
+    public long countByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses) {
+        return repository.countByCompanyIdAndStatusNotIn(companyId, excludedStatuses);
+    }
+
+    @Override
+    public Double findAverageRatingByCompanyId(Integer companyId) {
+        return repository.findAverageRatingByCompanyId(companyId);
+    }
+
+    @Override
+    public List<Service> findByCompanyIdAndStatus(Integer companyId, ServiceStatus status) {
+        return repository.findByCompanyIdAndStatus(companyId, status)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Service> findByCompanyIdAndStatusIn(Integer companyId, List<ServiceStatus> statuses) {
+        return repository.findByCompanyIdAndStatusIn(companyId, statuses)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Service> findAcceptedTodayByCompanyId(Integer companyId, List<ServiceStatus> statuses) {
+        return repository.findByCompanyIdAndStatusInAndDate(companyId, statuses)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 
 }

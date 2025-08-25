@@ -48,4 +48,6 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
     @Query("SELECT s FROM ServiceEntity s WHERE s.company.id = :companyId AND s.status IN :statuses AND FUNCTION('DATE', s.requestDate) = CURRENT_DATE")
     List<ServiceEntity> findByCompanyIdAndStatusInAndDate(@Param("companyId") Integer companyId, @Param("statuses") List<ServiceStatus> statuses);
 
+    long countByStatus(ServiceStatus status);
+
 }

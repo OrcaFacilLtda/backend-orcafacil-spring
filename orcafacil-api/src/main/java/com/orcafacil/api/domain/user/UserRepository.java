@@ -14,5 +14,7 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
     Optional<User> findByCpf(String cpf);
     List<User> findByTypeAndStatus(UserType type, UserStatus status);
+    long count();
+    long countByTypeAndStatus(UserType type, UserStatus status);
 
 }

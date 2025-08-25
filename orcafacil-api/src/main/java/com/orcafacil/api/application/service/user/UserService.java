@@ -198,4 +198,16 @@ public class UserService {
         }
         return userRepository.findByTypeAndStatus(type, status);
     }
+
+    @Transactional(readOnly = true)
+    public long countTotalUsers() {
+        return userRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public long countActiveProviders() {
+        return userRepository.countByTypeAndStatus(UserType.PROVIDER, UserStatus.APPROVED);
+    }
+
+
 }

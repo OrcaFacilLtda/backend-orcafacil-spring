@@ -16,15 +16,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@org.springframework.stereotype.Service // <-- Alterado de @Component para @Service para maior clareza semântica
+@org.springframework.stereotype.Service
 public class BusinessServiceService {
-
     private final ServiceRepository serviceRepository;
     private final UserRepository userRepository;
     private final BudgetRevisionRequestRepository revisionRequestRepository;
     private final EvaluationRepository evaluationRepository;
 
-    // Construtor atualizado com todas as dependências
+    // Construtor limpo e correto
     public BusinessServiceService(
             ServiceRepository serviceRepository,
             UserRepository userRepository,
@@ -34,6 +33,32 @@ public class BusinessServiceService {
         this.userRepository = userRepository;
         this.revisionRequestRepository = revisionRequestRepository;
         this.evaluationRepository = evaluationRepository;
+    }
+
+    // --- MÉTODOS DE BUSCA PARA ESTATÍSTICAS QUE DELEGAM PARA O REPOSITÓRIO ---
+
+    public long countServicesByCompanyId(Integer companyId) {
+        return serviceRepository.countByCompanyId(companyId);
+    }
+
+    public long countServicesByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses) {
+        return serviceRepository.countByCompanyIdAndStatusNotIn(companyId, excludedStatuses);
+    }
+
+    public Double getAverageRatingByCompanyId(Integer companyId) {
+        return serviceRepository.findAverageRatingByCompanyId(companyId);
+    }
+
+    public List<Service> findServicesByCompanyIdAndStatus(Integer companyId, ServiceStatus status) {
+        return serviceRepository.findByCompanyIdAndStatus(companyId, status);
+    }
+
+    public List<Service> findServicesByCompanyIdAndStatusIn(Integer companyId, List<ServiceStatus> statuses) {
+        return serviceRepository.findByCompanyIdAndStatusIn(companyId, statuses);
+    }
+
+    public List<Service> findServicesAcceptedTodayByCompanyId(Integer companyId, List<ServiceStatus> statuses) {
+        return serviceRepository.findAcceptedTodayByCompanyId(companyId, statuses);
     }
 
     private Service getServiceOrThrow(Integer serviceId) {
@@ -67,6 +92,16 @@ public class BusinessServiceService {
     }
 
     // --- LÓGICA DE NEGÓCIO DO FLUXO DE SERVIÇO ---
+
+    @Transactional
+    public Service acceptService(Integer serviceId, Integer providerId) {
+        Service service = getServiceOrThrow(serviceId);
+        if (!service.getCompany().getId().equals(providerId)) {
+            throw new IllegalStateException("Apenas o prestador de serviço responsável pode aceitar a solicitação.");
+        }
+        Service updatedService = service.withServiceStatus(ServiceStatus.NEGOTIATING_VISIT);
+        return serviceRepository.save(updatedService);
+    }
 
     @Transactional
     public Service rejectService(Integer serviceId, Integer providerId) {

@@ -48,7 +48,8 @@ public class JpaUserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findUserByType(String type) {
-        return springDataUserRepository.findByUserType(type)
+        return springDataUserRepository
+                .findByUserType(UserType.valueOf(type.toUpperCase()))
                 .stream()
                 .map(UserMapper::toDomain)
                 .collect(Collectors.toList());
@@ -92,4 +93,13 @@ public class JpaUserRepositoryImpl implements UserRepository {
     }
 
 
+    @Override
+    public long count() {
+        return springDataUserRepository.count();
+    }
+
+    @Override
+    public long countByTypeAndStatus(UserType type, UserStatus status) {
+        return springDataUserRepository.countByUserTypeAndStatus(type, status);
+    }
 }
