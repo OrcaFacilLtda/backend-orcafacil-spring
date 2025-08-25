@@ -1,9 +1,11 @@
 package com.orcafacil.api.application.service.service;
 
+import com.orcafacil.api.application.service.provider.ProviderService; // 1. IMPORTAR O PROVIDERSERVICE
 import com.orcafacil.api.domain.budgetrevisionrequest.BudgetRevisionRequest;
 import com.orcafacil.api.domain.budgetrevisionrequest.BudgetRevisionRequestRepository;
 import com.orcafacil.api.domain.evaluation.Evaluation;
 import com.orcafacil.api.domain.evaluation.EvaluationRepository;
+import com.orcafacil.api.domain.provider.Provider; // 2. IMPORTAR O PROVIDER
 import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.domain.service.ServiceRepository;
 import com.orcafacil.api.domain.service.ServiceStatus;
@@ -22,17 +24,20 @@ public class BusinessServiceService {
     private final UserRepository userRepository;
     private final BudgetRevisionRequestRepository revisionRequestRepository;
     private final EvaluationRepository evaluationRepository;
+    private final ProviderService providerService; // 3. ADICIONAR A DEPENDÊNCIA
 
-    // Construtor limpo e correto
+    // 4. ATUALIZAR O CONSTRUTOR
     public BusinessServiceService(
             ServiceRepository serviceRepository,
             UserRepository userRepository,
             BudgetRevisionRequestRepository revisionRequestRepository,
-            EvaluationRepository evaluationRepository) {
+            EvaluationRepository evaluationRepository,
+            ProviderService providerService) { // Adicionar aqui
         this.serviceRepository = serviceRepository;
         this.userRepository = userRepository;
         this.revisionRequestRepository = revisionRequestRepository;
         this.evaluationRepository = evaluationRepository;
+        this.providerService = providerService; // Adicionar aqui
     }
 
     // --- MÉTODOS DE BUSCA PARA ESTATÍSTICAS QUE DELEGAM PARA O REPOSITÓRIO ---
@@ -59,6 +64,13 @@ public class BusinessServiceService {
 
     public List<Service> findServicesAcceptedTodayByCompanyId(Integer companyId, List<ServiceStatus> statuses) {
         return serviceRepository.findAcceptedTodayByCompanyId(companyId, statuses);
+    }
+
+    // --- 5. ADICIONAR O MÉTODO QUE FALTAVA ---
+    public Provider findProviderByCompanyId(Integer companyId) {
+        // Delega a responsabilidade para o serviço correto
+        return providerService.findByCompanyId(companyId)
+                .orElse(null); // Retorna null se não encontrar
     }
 
     private Service getServiceOrThrow(Integer serviceId) {
