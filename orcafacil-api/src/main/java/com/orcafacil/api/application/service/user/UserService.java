@@ -209,5 +209,17 @@ public class UserService {
         return userRepository.countByTypeAndStatus(UserType.PROVIDER, UserStatus.APPROVED);
     }
 
+    @Transactional
+    public User updateStatus(Integer id, UserStatus newStatus) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("ID do usuário inválido.");
+        }
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        User updatedUser = existingUser.withStatus(newStatus);
+
+        return userRepository.update(updatedUser);
+    }
 
 }

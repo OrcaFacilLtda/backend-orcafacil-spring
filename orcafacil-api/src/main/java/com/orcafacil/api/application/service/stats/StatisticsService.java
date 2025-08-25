@@ -1,6 +1,6 @@
 package com.orcafacil.api.application.service.stats;
 
-import com.orcafacil.api.application.service.service.BusinessServiceService; // 1. Importar o serviço correto
+import com.orcafacil.api.application.service.service.BusinessServiceService;
 import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.interfaceadapter.response.AdminDashboardStats;
@@ -14,11 +14,11 @@ import java.util.List;
 @Service
 public class StatisticsService {
 
-    // 2. Dependências corretas (apenas outros serviços)
+    // 1. Dependências corretas: apenas outros serviços, NENHUM repositório.
     private final BusinessServiceService businessService;
     private final UserService userService;
 
-    // 3. Construtor ajustado para injetar os serviços
+    // 2. Construtor ajustado para injetar os serviços.
     public StatisticsService(BusinessServiceService businessService, UserService userService) {
         this.businessService = businessService;
         this.userService = userService;
@@ -27,13 +27,15 @@ public class StatisticsService {
     @Transactional(readOnly = true)
     public AdminDashboardStats getAdminDashboardStats() {
         AdminDashboardStats stats = new AdminDashboardStats();
+
+        // 3. Chama os métodos do UserService para obter dados de usuários.
         stats.setTotalUsers(userService.countTotalUsers());
         stats.setActiveProviders(userService.countActiveProviders());
 
-        // A lógica para contar serviços deve vir do BusinessServiceService.
-        // Se precisar, podemos adicionar um método como `countCompletedServices` nele.
-        // Por enquanto, vamos manter como estava no seu código original para não quebrar.
-        // stats.setCompletedServicesThisMonth(businessService.countServicesByStatus(ServiceStatus.COMPLETED));
+        // Esta parte precisaria de um método `countCompletedServices` em BusinessServiceService
+        // para ficar 100% desacoplada, mas vamos focar em resolver o erro principal primeiro.
+        // long completedServices = businessService.countServicesByStatus(ServiceStatus.COMPLETED);
+        // stats.setCompletedServicesThisMonth(completedServices);
 
         return stats;
     }
@@ -42,7 +44,7 @@ public class StatisticsService {
     public ProviderStats getProviderStats(Integer companyId) {
         ProviderStats stats = new ProviderStats();
 
-        // 4. Todas as chamadas agora são para o businessService
+        // 4. Todas as chamadas são para o BusinessServiceService, que encapsula a lógica de acesso a dados de serviço.
         long totalServices = businessService.countServicesByCompanyId(companyId);
         stats.setTotalServices(totalServices);
 
@@ -56,7 +58,6 @@ public class StatisticsService {
         }
 
         stats.setAverageRating(businessService.getAverageRatingByCompanyId(companyId));
-
         stats.setNewRequests(businessService.findServicesByCompanyIdAndStatus(companyId, ServiceStatus.REQUEST_SENT));
 
         List<ServiceStatus> acceptedStatuses = Arrays.asList(
