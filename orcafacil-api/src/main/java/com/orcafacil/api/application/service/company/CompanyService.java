@@ -31,7 +31,6 @@ public class CompanyService {
     public Company create(CreateCompanyRequest request) {
         validate(request);
 
-        // Apenas cria o objeto de domínio Address
         Address address = new Address(
                 null,
                 request.getAddress().getZipCode(),
@@ -51,21 +50,16 @@ public class CompanyService {
                 new Date()
         );
 
-        // A persistência do endereço ocorrerá em cascata
         return companyRepository.save(company);
     }
 
+    
     @Transactional
     public Company update(UpdateCompanyRequest request) {
         validate(request);
 
-        Company existing = companyRepository.findByCnpj(request.getCnpj())
-                .orElseGet(() -> companyRepository.findByAll()
-                        .stream()
-                        .filter(c -> request.getId() != null && request.getId().equals(c.getId()))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("Empresa não encontrada"))
-                );
+        Company existing = companyRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Empresa não encontrada para o ID: " + request.getId()));
 
         Address address = new Address(
                 request.getAddress().getId(),

@@ -53,8 +53,8 @@ public class ProviderService {
         if (request.getUserRequest() == null || request.getUserRequest().getAddress() == null) {
             throw new IllegalArgumentException("Dados do usuário e seu endereço são obrigatórios.");
         }
-        if (request.getCompanyRequest() == null || request.getCompanyRequest().getAddress() == null) {
-            throw new IllegalArgumentException("Dados da empresa e seu endereço são obrigatórios.");
+        if (request.getCompanyRequest() == null) {
+            throw new IllegalArgumentException("Dados da empresa são obrigatórios.");
         }
         if (userService.existsByEmail(request.getUserRequest().getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado.");
@@ -69,15 +69,39 @@ public class ProviderService {
         Category category = categoryService.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
 
-
-        Address userAddress = new Address(null, request.getUserRequest().getAddress().getZipCode(), request.getUserRequest().getAddress().getStreet(), request.getUserRequest().getAddress().getNumber(), request.getUserRequest().getAddress().getNeighborhood(), request.getUserRequest().getAddress().getCity(), request.getUserRequest().getAddress().getState(), request.getUserRequest().getAddress().getComplement());
+        Address sharedAddress = new Address(
+                null,
+                request.getUserRequest().getAddress().getZipCode(),
+                request.getUserRequest().getAddress().getStreet(),
+                request.getUserRequest().getAddress().getNumber(),
+                request.getUserRequest().getAddress().getNeighborhood(),
+                request.getUserRequest().getAddress().getCity(),
+                request.getUserRequest().getAddress().getState(),
+                request.getUserRequest().getAddress().getComplement()
+        );
 
         String hashedPassword = passwordEncoder.encode(request.getUserRequest().getPassword());
-        User user = new User(null, request.getUserRequest().getName(), request.getUserRequest().getPhone(), request.getUserRequest().getEmail(), hashedPassword, request.getUserRequest().getCpf(), UserType.PROVIDER, request.getUserRequest().getBirthDate(), UserStatus.PENDING, userAddress);
 
-        Address companyAddress = new Address(null, request.getCompanyRequest().getAddress().getZipCode(), request.getCompanyRequest().getAddress().getStreet(), request.getCompanyRequest().getAddress().getNumber(), request.getCompanyRequest().getAddress().getNeighborhood(), request.getCompanyRequest().getAddress().getCity(), request.getCompanyRequest().getAddress().getState(), request.getCompanyRequest().getAddress().getComplement());
+        User user = new User(
+                null,
+                request.getUserRequest().getName(),
+                request.getUserRequest().getPhone(),
+                request.getUserRequest().getEmail(),
+                hashedPassword,
+                request.getUserRequest().getCpf(),
+                UserType.PROVIDER,
+                request.getUserRequest().getBirthDate(),
+                UserStatus.PENDING,
+                sharedAddress
+        );
 
-        Company company = new Company(null, request.getCompanyRequest().getLegalName(), request.getCompanyRequest().getCnpj(), companyAddress, new Date());
+        Company company = new Company(
+                null,
+                request.getCompanyRequest().getLegalName(),
+                request.getCompanyRequest().getCnpj(),
+                sharedAddress,
+                new Date()
+        );
 
         Provider provider = new Provider(user, company, category);
         return repository.save(provider);
