@@ -31,8 +31,9 @@ public class CompanyService {
     public Company create(CreateCompanyRequest request) {
         validate(request);
 
+        // Apenas cria o objeto de domínio Address
         Address address = new Address(
-                request.getAddress().getId(),
+                null,
                 request.getAddress().getZipCode(),
                 request.getAddress().getStreet(),
                 request.getAddress().getNumber(),
@@ -50,6 +51,7 @@ public class CompanyService {
                 new Date()
         );
 
+        // A persistência do endereço ocorrerá em cascata
         return companyRepository.save(company);
     }
 

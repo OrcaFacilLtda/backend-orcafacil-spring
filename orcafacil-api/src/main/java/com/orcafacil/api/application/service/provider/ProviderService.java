@@ -3,6 +3,7 @@ package com.orcafacil.api.application.service.provider;
 import com.orcafacil.api.application.service.company.CompanyService;
 import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.application.service.category.CategoryService;
+import com.orcafacil.api.domain.address.Address;
 import com.orcafacil.api.domain.company.Company;
 import com.orcafacil.api.domain.provider.Provider;
 import com.orcafacil.api.domain.provider.ProviderRepository;
@@ -12,10 +13,12 @@ import com.orcafacil.api.domain.user.UserStatus;
 import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.interfaceadapter.request.provider.CreateProviderRequest;
 import com.orcafacil.api.interfaceadapter.request.provider.UpdateProviderRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +29,20 @@ public class ProviderService {
     private final CompanyService companyService;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final PasswordEncoder passwordEncoder;
 
     public ProviderService(
             ProviderRepository repository,
             CompanyService companyService,
             UserService userService,
-            CategoryService categoryService
+            CategoryService categoryService,
+            PasswordEncoder passwordEncoder
     ) {
         this.repository = repository;
         this.companyService = companyService;
         this.userService = userService;
         this.categoryService = categoryService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -44,19 +50,12 @@ public class ProviderService {
         if (request.getCategoryId() == null) {
             throw new IllegalArgumentException("Categoria é obrigatória.");
         }
-        if (request.getUserRequest() == null) {
-            throw new IllegalArgumentException("Usuário é obrigatório.");
+        if (request.getUserRequest() == null || request.getUserRequest().getAddress() == null) {
+            throw new IllegalArgumentException("Dados do usuário e seu endereço são obrigatórios.");
         }
-        if (request.getCompanyRequest() == null) {
-            throw new IllegalArgumentException("Companhia é obrigatória.");
+        if (request.getCompanyRequest() == null || request.getCompanyRequest().getAddress() == null) {
+            throw new IllegalArgumentException("Dados da empresa e seu endereço são obrigatórios.");
         }
-        if (request.getCompanyRequest().getAddress() == null) {
-            throw new IllegalArgumentException("Endereço da companhia é obrigatório.");
-        }
-
-        Category category = categoryService.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
-
         if (userService.existsByEmail(request.getUserRequest().getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado.");
         }
@@ -67,8 +66,18 @@ public class ProviderService {
             throw new IllegalArgumentException("CNPJ já cadastrado.");
         }
 
-        User user = userService.create(request.getUserRequest());
-        Company company = companyService.create(request.getCompanyRequest());
+        Category category = categoryService.findById(request.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+
+
+        Address userAddress = new Address(null, request.getUserRequest().getAddress().getZipCode(), request.getUserRequest().getAddress().getStreet(), request.getUserRequest().getAddress().getNumber(), request.getUserRequest().getAddress().getNeighborhood(), request.getUserRequest().getAddress().getCity(), request.getUserRequest().getAddress().getState(), request.getUserRequest().getAddress().getComplement());
+
+        String hashedPassword = passwordEncoder.encode(request.getUserRequest().getPassword());
+        User user = new User(null, request.getUserRequest().getName(), request.getUserRequest().getPhone(), request.getUserRequest().getEmail(), hashedPassword, request.getUserRequest().getCpf(), UserType.PROVIDER, request.getUserRequest().getBirthDate(), UserStatus.PENDING, userAddress);
+
+        Address companyAddress = new Address(null, request.getCompanyRequest().getAddress().getZipCode(), request.getCompanyRequest().getAddress().getStreet(), request.getCompanyRequest().getAddress().getNumber(), request.getCompanyRequest().getAddress().getNeighborhood(), request.getCompanyRequest().getAddress().getCity(), request.getCompanyRequest().getAddress().getState(), request.getCompanyRequest().getAddress().getComplement());
+
+        Company company = new Company(null, request.getCompanyRequest().getLegalName(), request.getCompanyRequest().getCnpj(), companyAddress, new Date());
 
         Provider provider = new Provider(user, company, category);
         return repository.save(provider);
@@ -117,7 +126,6 @@ public class ProviderService {
         if (request.getCompanyUpdateRequest() != null) {
             companyService.update(request.getCompanyUpdateRequest());
         }
-
 
         Category updatedCategory = provider.getCategory();
         if (request.getCategoryId() != null && !request.getCategoryId().equals(updatedCategory.getId())) {

@@ -10,13 +10,13 @@ public class ProviderEntity {
     @Id
     private Integer id;
 
-    @OneToOne(optional = false, cascade = CascadeType.MERGE)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "id", referencedColumnName = "id")
     private UserEntity user;
 
 
-    @OneToOne(optional = false, cascade = CascadeType.MERGE)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = false, unique = true)
     private CompanyEntity company;
 

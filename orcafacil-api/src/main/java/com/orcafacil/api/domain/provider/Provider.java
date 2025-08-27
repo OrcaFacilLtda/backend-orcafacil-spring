@@ -23,14 +23,14 @@ public class Provider {
     }
 
     private void validateUser(User user) {
-        if (user == null || user.getId() == null) {
-            throw new DomainException("Usuário é obrigatório e deve ter um ID válido.");
+        if (user == null) {
+            throw new DomainException("Usuário é obrigatório.");
         }
     }
 
     private void validateCompany(Company company) {
-        if (company == null || company.getId() == null) {
-            throw new DomainException("Empresa é obrigatória e deve ter um ID válido.");
+        if (company == null) {
+            throw new DomainException("Empresa é obrigatória.");
         }
     }
 

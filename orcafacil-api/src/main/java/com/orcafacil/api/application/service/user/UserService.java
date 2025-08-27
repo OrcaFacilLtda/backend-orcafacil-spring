@@ -36,7 +36,7 @@ public class UserService {
 
     @Transactional
     public User create(UserRequest request) {
-        // Validação do DTO
+        // Validação do DTO (Data Transfer Object)
         Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Dados do usuário inválidos", violations);
@@ -46,7 +46,16 @@ public class UserService {
             throw new IllegalArgumentException("Endereço é obrigatório para criar usuário.");
         }
 
-        Address savedAddress = addressService.createAddress(request.getAddress());
+        Address address = new Address(
+                null,
+                request.getAddress().getZipCode(),
+                request.getAddress().getStreet(),
+                request.getAddress().getNumber(),
+                request.getAddress().getNeighborhood(),
+                request.getAddress().getCity(),
+                request.getAddress().getState(),
+                request.getAddress().getComplement()
+        );
 
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
@@ -60,7 +69,7 @@ public class UserService {
                 UserType.valueOf(request.getUserType()),
                 request.getBirthDate(),
                 UserStatus.valueOf(request.getStatus()),
-                savedAddress
+                address
         );
 
         return userRepository.save(user);
@@ -72,7 +81,6 @@ public class UserService {
             throw new IllegalArgumentException("ID do usuário inválido.");
         }
 
-        // Validação do DTO
         Set<ConstraintViolation<UserUpdateRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Dados de atualização inválidos", violations);
@@ -81,7 +89,6 @@ public class UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        // Atualizações de dados pessoais
         if (request.getName() != null && !request.getName().trim().isEmpty()) {
             existingUser = existingUser.withName(request.getName());
         }
@@ -141,7 +148,8 @@ public class UserService {
         });
     }
 
-    // Consultas
+    // --- Métodos de Consulta ---
+
     public Optional<User> findById(Integer id) {
         if (id == null || id <= 0) throw new IllegalArgumentException("ID inválido.");
         return userRepository.findById(id);
@@ -209,5 +217,4 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
-
 }

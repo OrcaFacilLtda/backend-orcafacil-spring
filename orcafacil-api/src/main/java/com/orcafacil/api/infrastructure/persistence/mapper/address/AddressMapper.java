@@ -7,9 +7,8 @@ import com.orcafacil.api.interfaceadapter.request.address.AddressRequest;
 public class AddressMapper {
 
     public static AddressEntity toEntity(Address address) {
-        Integer entityId = (address.getId() != null && address.getId() > 0) ? address.getId() : null;
         return new AddressEntity(
-                null,
+                address.getId(),
                 address.getStreet(),
                 address.getNumber(),
                 address.getComplement(),
