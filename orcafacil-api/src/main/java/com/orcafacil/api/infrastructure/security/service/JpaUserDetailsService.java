@@ -24,7 +24,6 @@ public class JpaUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o e-mail: " + email));
 
-        // Converte o nosso User (domínio) para o UserDetails (Spring Security)
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),

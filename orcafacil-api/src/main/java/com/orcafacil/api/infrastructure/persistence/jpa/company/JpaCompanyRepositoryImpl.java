@@ -59,7 +59,21 @@ public class JpaCompanyRepositoryImpl implements CompanyRepository {
                 .map(CompanyMapper::toDomain);
     }
 
+    @Override
+    public List<Company> findByAll() {
+        return  springDataCompanyRepository
+                .findAll()
+                .stream()
+                .map(CompanyMapper::toDomain)
+                .toList();
+    }
 
+    @Override
+    public Optional<Company> findById(Integer id) {
+        return springDataCompanyRepository
+                .findById(id)
+                .map(CompanyMapper::toDomain);
+    }
 
 
 }

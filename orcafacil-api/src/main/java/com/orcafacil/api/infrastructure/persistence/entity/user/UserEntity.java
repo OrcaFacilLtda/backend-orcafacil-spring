@@ -42,7 +42,7 @@ public class UserEntity {
     @Column(name = "status", nullable = false, length = 10)
     private UserStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false, unique = true)
     private AddressEntity address;
 
@@ -130,7 +130,7 @@ public class UserEntity {
         return address;
     }
 
-    public void setAddressId(AddressEntity address) {this.address = address;}
+    public void setAddress(AddressEntity address) { this.address = address; }
 
     @Override
     public boolean equals(Object o) {

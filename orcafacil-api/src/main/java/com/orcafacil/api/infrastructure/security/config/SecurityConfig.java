@@ -4,17 +4,19 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.orcafacil.api.infrastructure.security.filter.JwtAuthenticationFilter;
+import com.orcafacil.api.infrastructure.security.jwt.TokenService;
 import jakarta.servlet.http.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -23,14 +25,18 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Mantemos para usar @PreAuthorize para regras complexas como a de status 'APPROVED'
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final RSAPublicKey rsaPublicKey;
@@ -48,8 +54,8 @@ public class SecurityConfig {
             if (cookies != null) {
                 return Arrays.stream(cookies)
                         .filter(cookie -> "auth-token".equals(cookie.getName()))
-                        .findFirst()
                         .map(Cookie::getValue)
+                        .findFirst()
                         .orElse(null);
             }
             return null;
@@ -57,47 +63,54 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public TokenService tokenService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
+        return new TokenService(jwtEncoder, jwtDecoder);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   TokenService tokenService,
+                                                   UserDetailsService userDetailsService) throws Exception {
+
+        JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(tokenService, userDetailsService);
+
         http
-                .authorizeHttpRequests(auth -> auth
-                        // --- ROTAS PÚBLICAS ---
-                        .requestMatchers(HttpMethod.POST, "/login", "/logout").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Cadastro de cliente
-                        .requestMatchers(HttpMethod.POST, "/api/providers").permitAll() // Cadastro de prestador
-
-                        // --- ROTAS DE ADMIN ---
-                        .requestMatchers("/api/categories/**").hasAuthority("SCOPE_ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/users/{id}/status").hasAuthority("SCOPE_ADMIN")
-
-                        // --- ROTAS DE PROVIDER ---
-                        .requestMatchers("/api/providers/**").hasAuthority("SCOPE_PROVIDER")
-
-                        // --- ROTAS DE CLIENT E PROVIDER ---
-                        .requestMatchers("/api/services/**").hasAnyAuthority("SCOPE_CLIENT", "SCOPE_PROVIDER")
-                        .requestMatchers("/api/users/**").hasAnyAuthority("SCOPE_CLIENT", "SCOPE_PROVIDER") // Demais rotas de users
-
-                        // --- REGRA GERAL ---
-                        .anyRequest().authenticated() // Qualquer outra rota exige autenticação
-                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults())
-                        .bearerTokenResolver(bearerTokenResolver())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/login", "/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users", "/api/providers").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/categories").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .addFilterBefore(jwtFilter,
+                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(this.rsaPublicKey)
-                .privateKey(this.rsaPrivateKey)
-                .build();
+        JWK jwk = new RSAKey.Builder(rsaPublicKey).privateKey(rsaPrivateKey).build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }

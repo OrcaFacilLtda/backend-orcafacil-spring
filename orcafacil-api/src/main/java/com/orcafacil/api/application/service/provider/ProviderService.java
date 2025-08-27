@@ -21,6 +21,7 @@ import java.util.Optional;
 
 @Service
 public class ProviderService {
+
     private final ProviderRepository repository;
     private final CompanyService companyService;
     private final UserService userService;
@@ -73,7 +74,7 @@ public class ProviderService {
         return repository.save(provider);
     }
 
-
+    @Transactional(readOnly = true)
     public Optional<Provider> findById(Integer id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID inválido para busca.");
@@ -81,6 +82,7 @@ public class ProviderService {
         return repository.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public Optional<Provider> findByCompanyId(Integer companyId) {
         if (companyId == null || companyId <= 0) {
             throw new IllegalArgumentException("ID da empresa inválido para busca.");
@@ -96,7 +98,7 @@ public class ProviderService {
         repository.deleteById(providerId);
 
         userService.delete(provider.getUser().getId());
-        companyService.delete(provider.getCompany().getId());
+        companyService.deleteById(provider.getCompany().getId());
     }
 
     @Transactional
@@ -111,9 +113,11 @@ public class ProviderService {
         if (request.getUserUpdateRequest() != null) {
             userService.update(provider.getUser().getId(), request.getUserUpdateRequest());
         }
+
         if (request.getCompanyUpdateRequest() != null) {
-            companyService.update(provider.getCompany().getId(), request.getCompanyUpdateRequest());
+            companyService.update(request.getCompanyUpdateRequest());
         }
+
 
         Category updatedCategory = provider.getCategory();
         if (request.getCategoryId() != null && !request.getCategoryId().equals(updatedCategory.getId())) {
@@ -122,8 +126,8 @@ public class ProviderService {
         }
 
         User updatedUser = userService.findById(provider.getUser().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-        Company updatedCompany = companyService.findByUserId(provider.getCompany().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        Company updatedCompany = companyService.findById(provider.getCompany().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
 
         Provider updatedProvider = provider
@@ -146,4 +150,8 @@ public class ProviderService {
         return repository.findAllByUserIn(activeProviderUsers);
     }
 
+    @Transactional(readOnly = true)
+    public List<Provider> findAll() {
+        return repository.findAll();
+    }
 }

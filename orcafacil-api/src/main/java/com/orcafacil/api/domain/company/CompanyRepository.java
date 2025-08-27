@@ -12,5 +12,7 @@ public interface CompanyRepository {
     void deleteByCompanyId(Integer id);
     Optional<Company> getByUserId(Integer id);
     Optional<Company> findByCnpj(String cnpj);
+    List<Company> findByAll();
+    Optional<Company> findById(Integer id);
 
 }

@@ -26,5 +26,7 @@ public interface SpringDataProviderRepository extends JpaRepository<ProviderEnti
 
     List<ProviderEntity> findByUserIn(List<UserEntity> users);
 
+    @Override
+    List<ProviderEntity> findAll();
 }
 

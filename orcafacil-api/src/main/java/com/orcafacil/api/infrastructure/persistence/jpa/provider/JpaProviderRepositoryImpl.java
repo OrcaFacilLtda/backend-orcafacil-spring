@@ -58,6 +58,15 @@ public class JpaProviderRepositoryImpl implements ProviderRepository {
     }
 
     @Override
+    public List<Provider> findAll() {
+        return springDataProviderRepository
+                .findAll()
+                .stream()
+                .map(ProviderMapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public List<Provider> findAllByUserIn(List<User> users) {
         List<UserEntity> userEntities = users.stream()
                 .map(UserMapper::toEntity)

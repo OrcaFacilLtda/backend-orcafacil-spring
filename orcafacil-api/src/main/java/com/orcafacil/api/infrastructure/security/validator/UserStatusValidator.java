@@ -27,7 +27,7 @@ public class UserStatusValidator {
         }
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userEmail = jwt.getSubject(); // O "subject" do token JWT é o email do usuário
+        String userEmail = jwt.getSubject();
 
         User user = userRepository.findByEmail(userEmail)
                 .orElse(null);

@@ -6,8 +6,14 @@ import com.orcafacil.api.domain.user.UserStatus;
 import com.orcafacil.api.interfaceadapter.request.user.UserRequest;
 import com.orcafacil.api.interfaceadapter.request.user.UserUpdateRequest;
 import com.orcafacil.api.interfaceadapter.response.ApiResponse;
+import com.orcafacil.api.interfaceadapter.response.UserResponse;
+import com.orcafacil.api.infrastructure.security.jwt.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +22,11 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final TokenService tokenService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, TokenService tokenService) {
         this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping
@@ -91,4 +99,34 @@ public class UserController {
         User updatedUser = userService.updateStatus(id, UserStatus.valueOf(newStatus.toUpperCase()));
         return ResponseEntity.ok(new ApiResponse<>(true, "Status do usuário atualizado com sucesso.", updatedUser));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(HttpServletRequest request) {
+        try {
+            String token = tokenService.extractTokenFromRequest(request);
+            if (token == null) return ResponseEntity.status(401)
+                    .body(new ApiResponse<>(false, "Token não encontrado.", null));
+
+            String email = tokenService.getEmailFromToken(token);
+            User user = userService.getUserByEmail(email);
+
+            UserResponse userResponse = new UserResponse(
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getPhone(),
+                    user.getCpf(),
+                    user.getUserType(),
+                    user.getStatus(),
+                    user.getBirthDate()
+            );
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Usuário logado recuperado com sucesso.", userResponse));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse<>(false, "Erro ao recuperar usuário logado.", null));
+        }
+    }
+
+
 }

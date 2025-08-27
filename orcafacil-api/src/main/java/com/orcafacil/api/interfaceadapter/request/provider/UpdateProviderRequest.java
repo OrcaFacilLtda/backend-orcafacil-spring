@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 
 public class UpdateProviderRequest {
 
+
+
     @NotNull(message = "Dados do usuário são obrigatórios para atualização")
     private UserUpdateRequest userUpdateRequest;
 
