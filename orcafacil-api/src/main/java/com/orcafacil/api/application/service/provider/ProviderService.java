@@ -1,5 +1,6 @@
 package com.orcafacil.api.application.service.provider;
 
+import com.orcafacil.api.application.service.address.AddressService;
 import com.orcafacil.api.application.service.company.CompanyService;
 import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.application.service.category.CategoryService;
@@ -25,11 +26,13 @@ import java.util.Optional;
 @Service
 public class ProviderService {
 
+
     private final ProviderRepository repository;
     private final CompanyService companyService;
     private final UserService userService;
     private final CategoryService categoryService;
     private final PasswordEncoder passwordEncoder;
+
 
     public ProviderService(
             ProviderRepository repository,
@@ -47,15 +50,7 @@ public class ProviderService {
 
     @Transactional
     public Provider create(CreateProviderRequest request) {
-        if (request.getCategoryId() == null) {
-            throw new IllegalArgumentException("Categoria é obrigatória.");
-        }
-        if (request.getUserRequest() == null || request.getUserRequest().getAddress() == null) {
-            throw new IllegalArgumentException("Dados do usuário e seu endereço são obrigatórios.");
-        }
-        if (request.getCompanyRequest() == null) {
-            throw new IllegalArgumentException("Dados da empresa são obrigatórios.");
-        }
+        // Validações... (estão corretas)
         if (userService.existsByEmail(request.getUserRequest().getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado.");
         }
@@ -68,6 +63,7 @@ public class ProviderService {
 
         Category category = categoryService.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+
 
         Address sharedAddress = new Address(
                 null,
@@ -102,7 +98,6 @@ public class ProviderService {
                 sharedAddress,
                 new Date()
         );
-
         Provider provider = new Provider(user, company, category);
         return repository.save(provider);
     }

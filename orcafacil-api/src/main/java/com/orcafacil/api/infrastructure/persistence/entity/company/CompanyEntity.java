@@ -19,7 +19,7 @@ public class CompanyEntity {
     @Column(nullable = false, unique = true, length = 14)
     private String cnpj;
 
-    @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id", nullable = false, unique = true)
     private AddressEntity address;
 
