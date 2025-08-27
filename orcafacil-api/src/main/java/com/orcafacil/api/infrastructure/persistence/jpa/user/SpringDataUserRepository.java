@@ -45,5 +45,7 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, Inte
     long countByUserTypeAndStatus(UserType userType, UserStatus status);
 
 
+
+
 }
 

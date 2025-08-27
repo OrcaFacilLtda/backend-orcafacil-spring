@@ -46,4 +46,5 @@ public interface SpringDataAddressRepository extends JpaRepository<AddressEntity
             String zipCode
     );
 
+
 }
