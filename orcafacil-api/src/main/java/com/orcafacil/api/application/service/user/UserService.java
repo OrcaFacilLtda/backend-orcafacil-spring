@@ -2,6 +2,8 @@ package com.orcafacil.api.application.service.user;
 
 import com.orcafacil.api.application.service.address.AddressService;
 import com.orcafacil.api.domain.address.Address;
+import com.orcafacil.api.domain.service.ServiceRepository; // IMPORTADO
+import com.orcafacil.api.domain.service.ServiceStatus;   // IMPORTADO
 import com.orcafacil.api.domain.user.*;
 import com.orcafacil.api.interfaceadapter.request.user.UserRequest;
 import com.orcafacil.api.interfaceadapter.request.user.UserUpdateRequest;
@@ -23,15 +25,18 @@ public class UserService {
     private final AddressService addressService;
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
+    private final ServiceRepository serviceRepository; // ADICIONADO
 
     public UserService(UserRepository userRepository,
                        AddressService addressService,
                        Validator validator,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       ServiceRepository serviceRepository) { // ADICIONADO
         this.userRepository = userRepository;
         this.addressService = addressService;
         this.validator = validator;
         this.passwordEncoder = passwordEncoder;
+        this.serviceRepository = serviceRepository; // ADICIONADO
     }
 
     @Transactional
@@ -138,14 +143,24 @@ public class UserService {
             throw new IllegalArgumentException("ID do usuário inválido.");
         }
 
-        Optional<User> userOpt = userRepository.findById(id);
-        userOpt.ifPresent(user -> {
-            Address address = user.getAddress();
-            if (address != null && address.getId() != null) {
-                addressService.deleteAddress(address.getId());
-            }
-            userRepository.deleteById(id);
-        });
+        // ✅ **INÍCIO DA LÓGICA DE VERIFICAÇÃO**
+        // Verifica se o usuário a ser deletado possui algum serviço que não esteja finalizado ou rejeitado.
+        boolean hasActiveServices = serviceRepository.findByUserId(id).stream()
+                .anyMatch(service ->
+                        service.getServiceStatus() != ServiceStatus.COMPLETED &&
+                                service.getServiceStatus() != ServiceStatus.REJECTED
+                );
+
+        // Se existirem serviços ativos, lança uma exceção para impedir a exclusão.
+        if (hasActiveServices) {
+            throw new IllegalStateException("Usuário não pode ser excluído, pois possui serviços em andamento.");
+        }
+        // ✅ **FIM DA LÓGICA DE VERIFICAÇÃO**
+
+        // Se não houver serviços ativos, a exclusão pode prosseguir.
+        // A anotação @OneToOne(cascade = CascadeType.ALL) na UserEntity garantirá
+        // que o endereço associado também seja removido.
+        userRepository.deleteById(id);
     }
 
     // --- Métodos de Consulta ---

@@ -1,19 +1,21 @@
 package com.orcafacil.api.application.service.provider;
 
 import com.orcafacil.api.application.service.address.AddressService;
-import com.orcafacil.api.application.service.company.CompanyService;
-import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.application.service.category.CategoryService;
 import com.orcafacil.api.domain.address.Address;
+import com.orcafacil.api.domain.category.Category;
 import com.orcafacil.api.domain.company.Company;
 import com.orcafacil.api.domain.provider.Provider;
 import com.orcafacil.api.domain.provider.ProviderRepository;
+import com.orcafacil.api.domain.service.ServiceRepository;
+import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.domain.user.User;
-import com.orcafacil.api.domain.category.Category;
+import com.orcafacil.api.domain.user.UserRepository;
 import com.orcafacil.api.domain.user.UserStatus;
 import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.interfaceadapter.request.provider.CreateProviderRequest;
 import com.orcafacil.api.interfaceadapter.request.provider.UpdateProviderRequest;
+import com.orcafacil.api.interfaceadapter.request.user.UserUpdateRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,44 +28,40 @@ import java.util.Optional;
 @Service
 public class ProviderService {
 
-
-    private final ProviderRepository repository;
-    private final CompanyService companyService;
-    private final UserService userService;
+    private final ProviderRepository providerRepository;
+    private final UserRepository userRepository;
     private final CategoryService categoryService;
     private final PasswordEncoder passwordEncoder;
-
+    private final ServiceRepository serviceRepository;
+    private final AddressService addressService;
 
     public ProviderService(
-            ProviderRepository repository,
-            CompanyService companyService,
-            UserService userService,
+            ProviderRepository providerRepository,
+            UserRepository userRepository,
             CategoryService categoryService,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            ServiceRepository serviceRepository,
+            AddressService addressService
     ) {
-        this.repository = repository;
-        this.companyService = companyService;
-        this.userService = userService;
+        this.providerRepository = providerRepository;
+        this.userRepository = userRepository;
         this.categoryService = categoryService;
         this.passwordEncoder = passwordEncoder;
+        this.serviceRepository = serviceRepository;
+        this.addressService = addressService;
     }
 
     @Transactional
     public Provider create(CreateProviderRequest request) {
-        // Validações... (estão corretas)
-        if (userService.existsByEmail(request.getUserRequest().getEmail())) {
+        if (userRepository.findByEmail(request.getUserRequest().getEmail()).isPresent()) {
             throw new IllegalArgumentException("E-mail já cadastrado.");
         }
-        if (userService.existsByCpf(request.getUserRequest().getCpf())) {
+        if (userRepository.findByCpf(request.getUserRequest().getCpf()).isPresent()) {
             throw new IllegalArgumentException("CPF já cadastrado.");
-        }
-        if (companyService.existsByCnpj(request.getCompanyRequest().getCnpj())) {
-            throw new IllegalArgumentException("CNPJ já cadastrado.");
         }
 
         Category category = categoryService.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
-
 
         Address sharedAddress = new Address(
                 null,
@@ -79,27 +77,18 @@ public class ProviderService {
         String hashedPassword = passwordEncoder.encode(request.getUserRequest().getPassword());
 
         User user = new User(
-                null,
-                request.getUserRequest().getName(),
-                request.getUserRequest().getPhone(),
-                request.getUserRequest().getEmail(),
-                hashedPassword,
-                request.getUserRequest().getCpf(),
-                UserType.PROVIDER,
-                request.getUserRequest().getBirthDate(),
-                UserStatus.PENDING,
+                null, request.getUserRequest().getName(), request.getUserRequest().getPhone(),
+                request.getUserRequest().getEmail(), hashedPassword, request.getUserRequest().getCpf(),
+                UserType.PROVIDER, request.getUserRequest().getBirthDate(), UserStatus.PENDING,
                 sharedAddress
         );
 
         Company company = new Company(
-                null,
-                request.getCompanyRequest().getLegalName(),
-                request.getCompanyRequest().getCnpj(),
-                sharedAddress,
-                new Date()
+                null, request.getCompanyRequest().getLegalName(), request.getCompanyRequest().getCnpj(),
+                sharedAddress, new Date()
         );
         Provider provider = new Provider(user, company, category);
-        return repository.save(provider);
+        return providerRepository.save(provider);
     }
 
     @Transactional(readOnly = true)
@@ -107,7 +96,7 @@ public class ProviderService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID inválido para busca.");
         }
-        return repository.findById(id);
+        return providerRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
@@ -115,19 +104,27 @@ public class ProviderService {
         if (companyId == null || companyId <= 0) {
             throw new IllegalArgumentException("ID da empresa inválido para busca.");
         }
-        return repository.findByCompanyId(companyId);
+        return providerRepository.findByCompanyId(companyId);
     }
 
     @Transactional
     public void deleteById(Integer providerId) {
-        Provider provider = repository.findById(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
+        Provider provider = providerRepository.findById(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("Fornecedor não encontrado"));
 
-        repository.deleteById(providerId);
+        boolean hasActiveServices = serviceRepository.findByUserId(provider.getUser().getId()).stream()
+                .anyMatch(service ->
+                        service.getServiceStatus() != ServiceStatus.COMPLETED &&
+                                service.getServiceStatus() != ServiceStatus.REJECTED
+                );
 
-        userService.delete(provider.getUser().getId());
-        companyService.deleteById(provider.getCompany().getId());
+        if (hasActiveServices) {
+            throw new IllegalStateException("Este fornecedor não pode ser excluído, pois possui serviços em andamento.");
+        }
+
+        providerRepository.deleteById(providerId);
     }
+
 
     @Transactional
     public Provider update(Integer providerId, UpdateProviderRequest request) {
@@ -135,50 +132,61 @@ public class ProviderService {
             throw new IllegalArgumentException("ID do provider inválido.");
         }
 
-        Provider provider = repository.findById(providerId)
+        Provider existingProvider = providerRepository.findById(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
 
-        if (request.getUserUpdateRequest() != null) {
-            userService.update(provider.getUser().getId(), request.getUserUpdateRequest());
+        User userToUpdate = existingProvider.getUser();
+        Company companyToUpdate = existingProvider.getCompany();
+        Category categoryToUpdate = existingProvider.getCategory();
+
+        UserUpdateRequest userRequest = request.getUserUpdateRequest();
+        if (userRequest != null) {
+            if (userRequest.getName() != null) userToUpdate = userToUpdate.withName(userRequest.getName());
+            if (userRequest.getPhone() != null) userToUpdate = userToUpdate.withPhone(userRequest.getPhone());
+            if (userRequest.getEmail() != null) userToUpdate = userToUpdate.withEmail(userRequest.getEmail());
+
+            if (userRequest.getAddress() != null) {
+                Address updatedAddress = addressService.updateAddress(userRequest.getAddress());
+                userToUpdate = userToUpdate.withAddress(updatedAddress);
+                companyToUpdate = companyToUpdate.withAddress(updatedAddress);
+            }
+
+            if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
+                if (userRequest.getCurrentPassword() == null || !passwordEncoder.matches(userRequest.getCurrentPassword(), userToUpdate.getPassword())) {
+                    throw new RuntimeException("Senha atual incorreta.");
+                }
+                userToUpdate = userToUpdate.withPassword(passwordEncoder.encode(userRequest.getPassword()));
+            }
         }
 
-        if (request.getCompanyUpdateRequest() != null) {
-            companyService.update(request.getCompanyUpdateRequest());
+        if (request.getCompanyUpdateRequest() != null && request.getCompanyUpdateRequest().getLegalName() != null) {
+            companyToUpdate = companyToUpdate.withLegalName(request.getCompanyUpdateRequest().getLegalName());
         }
 
-        Category updatedCategory = provider.getCategory();
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(updatedCategory.getId())) {
-            updatedCategory = categoryService.findById(request.getCategoryId())
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(categoryToUpdate.getId())) {
+            categoryToUpdate = categoryService.findById(request.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
         }
 
-        User updatedUser = userService.findById(provider.getUser().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
-        Company updatedCompany = companyService.findById(provider.getCompany().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
+        Provider finalUpdatedProvider = new Provider(userToUpdate, companyToUpdate, categoryToUpdate);
 
-        Provider updatedProvider = provider
-                .withUser(updatedUser)
-                .withCompany(updatedCompany)
-                .withCategory(updatedCategory);
-
-        return repository.save(updatedProvider);
+        return providerRepository.save(finalUpdatedProvider);
     }
 
     @Transactional(readOnly = true)
     public List<Provider> findAllActive() {
-        List<User> activeProviderUsers = userService
+        List<User> activeProviderUsers = userRepository
                 .findByTypeAndStatus(UserType.PROVIDER, UserStatus.APPROVED);
 
         if (activeProviderUsers.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return repository.findAllByUserIn(activeProviderUsers);
+        return providerRepository.findAllByUserIn(activeProviderUsers);
     }
 
     @Transactional(readOnly = true)
     public List<Provider> findAll() {
-        return repository.findAll();
+        return providerRepository.findAll();
     }
 }

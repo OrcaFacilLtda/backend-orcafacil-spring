@@ -50,7 +50,7 @@ public class JpaServiceRepositoryImpl implements ServiceRepository {
     @Override
     public List<Service> findByUserId(Integer userId) {
         return repository
-                .findByClientId(userId)
+                .findByUserId(userId)
                 .stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());

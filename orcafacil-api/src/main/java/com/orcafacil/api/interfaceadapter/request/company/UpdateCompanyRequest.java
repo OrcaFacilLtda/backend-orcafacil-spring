@@ -2,12 +2,13 @@ package com.orcafacil.api.interfaceadapter.request.company;
 
 import com.orcafacil.api.interfaceadapter.request.address.AddressRequest;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UpdateCompanyRequest {
 
-    @NotBlank(message = "ID da empresa é obrigatório")
+    @NotNull(message = "ID da empresa é obrigatório")
     private Integer id;
 
     @NotBlank(message = "Razão social é obrigatória")
