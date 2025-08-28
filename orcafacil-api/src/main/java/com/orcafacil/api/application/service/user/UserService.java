@@ -36,12 +36,11 @@ public class UserService {
         this.addressService = addressService;
         this.validator = validator;
         this.passwordEncoder = passwordEncoder;
-        this.serviceRepository = serviceRepository; // ADICIONADO
+        this.serviceRepository = serviceRepository;
     }
 
     @Transactional
     public User create(UserRequest request) {
-        // Validação do DTO (Data Transfer Object)
         Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Dados do usuário inválidos", violations);
@@ -143,24 +142,17 @@ public class UserService {
             throw new IllegalArgumentException("ID do usuário inválido.");
         }
 
-        // ✅ **INÍCIO DA LÓGICA DE VERIFICAÇÃO**
-        // Verifica se o usuário a ser deletado possui algum serviço que não esteja finalizado ou rejeitado.
-        boolean hasActiveServices = serviceRepository.findByUserId(id).stream()
+         boolean hasActiveServices = serviceRepository.findByUserId(id).stream()
                 .anyMatch(service ->
                         service.getServiceStatus() != ServiceStatus.COMPLETED &&
                                 service.getServiceStatus() != ServiceStatus.REJECTED
                 );
 
-        // Se existirem serviços ativos, lança uma exceção para impedir a exclusão.
         if (hasActiveServices) {
             throw new IllegalStateException("Usuário não pode ser excluído, pois possui serviços em andamento.");
         }
-        // ✅ **FIM DA LÓGICA DE VERIFICAÇÃO**
 
-        // Se não houver serviços ativos, a exclusão pode prosseguir.
-        // A anotação @OneToOne(cascade = CascadeType.ALL) na UserEntity garantirá
-        // que o endereço associado também seja removido.
-        userRepository.deleteById(id);
+            userRepository.deleteById(id);
     }
 
     // --- Métodos de Consulta ---

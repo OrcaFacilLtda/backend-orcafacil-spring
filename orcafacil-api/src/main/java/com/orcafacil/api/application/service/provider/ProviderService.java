@@ -2,6 +2,8 @@ package com.orcafacil.api.application.service.provider;
 
 import com.orcafacil.api.application.service.address.AddressService;
 import com.orcafacil.api.application.service.category.CategoryService;
+import com.orcafacil.api.application.service.company.CompanyService;
+import com.orcafacil.api.application.service.user.UserService;
 import com.orcafacil.api.domain.address.Address;
 import com.orcafacil.api.domain.category.Category;
 import com.orcafacil.api.domain.company.Company;
@@ -34,6 +36,8 @@ public class ProviderService {
     private final PasswordEncoder passwordEncoder;
     private final ServiceRepository serviceRepository;
     private final AddressService addressService;
+    private final UserService userService;
+    private final CompanyService companyService;
 
     public ProviderService(
             ProviderRepository providerRepository,
@@ -41,7 +45,9 @@ public class ProviderService {
             CategoryService categoryService,
             PasswordEncoder passwordEncoder,
             ServiceRepository serviceRepository,
-            AddressService addressService
+            AddressService addressService,
+            UserService userService,
+            CompanyService companyService
     ) {
         this.providerRepository = providerRepository;
         this.userRepository = userRepository;
@@ -49,6 +55,8 @@ public class ProviderService {
         this.passwordEncoder = passwordEncoder;
         this.serviceRepository = serviceRepository;
         this.addressService = addressService;
+        this.userService = userService;
+        this.companyService = companyService;
     }
 
     @Transactional
@@ -135,43 +143,26 @@ public class ProviderService {
         Provider existingProvider = providerRepository.findById(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
 
-        User userToUpdate = existingProvider.getUser();
-        Company companyToUpdate = existingProvider.getCompany();
-        Category categoryToUpdate = existingProvider.getCategory();
-
-        UserUpdateRequest userRequest = request.getUserUpdateRequest();
-        if (userRequest != null) {
-            if (userRequest.getName() != null) userToUpdate = userToUpdate.withName(userRequest.getName());
-            if (userRequest.getPhone() != null) userToUpdate = userToUpdate.withPhone(userRequest.getPhone());
-            if (userRequest.getEmail() != null) userToUpdate = userToUpdate.withEmail(userRequest.getEmail());
-
-            if (userRequest.getAddress() != null) {
-                Address updatedAddress = addressService.updateAddress(userRequest.getAddress());
-                userToUpdate = userToUpdate.withAddress(updatedAddress);
-                companyToUpdate = companyToUpdate.withAddress(updatedAddress);
-            }
-
-            if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
-                if (userRequest.getCurrentPassword() == null || !passwordEncoder.matches(userRequest.getCurrentPassword(), userToUpdate.getPassword())) {
-                    throw new RuntimeException("Senha atual incorreta.");
-                }
-                userToUpdate = userToUpdate.withPassword(passwordEncoder.encode(userRequest.getPassword()));
-            }
+        // Update User if request data is present
+        if (request.getUserUpdateRequest() != null) {
+            userService.update(existingProvider.getUser().getId(), request.getUserUpdateRequest());
         }
 
-        if (request.getCompanyUpdateRequest() != null && request.getCompanyUpdateRequest().getLegalName() != null) {
-            companyToUpdate = companyToUpdate.withLegalName(request.getCompanyUpdateRequest().getLegalName());
+        // Update Company if request data is present
+        if (request.getCompanyUpdateRequest() != null) {
+            companyService.update(request.getCompanyUpdateRequest());
         }
 
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(categoryToUpdate.getId())) {
-            categoryToUpdate = categoryService.findById(request.getCategoryId())
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(existingProvider.getCategory().getId())) {
+            Category newCategory = categoryService.findById(request.getCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+            Provider updatedProvider = existingProvider.withCategory(newCategory);
+            return providerRepository.save(updatedProvider);
         }
 
-        Provider finalUpdatedProvider = new Provider(userToUpdate, companyToUpdate, categoryToUpdate);
-
-        return providerRepository.save(finalUpdatedProvider);
+        return existingProvider;
     }
+
 
     @Transactional(readOnly = true)
     public List<Provider> findAllActive() {
