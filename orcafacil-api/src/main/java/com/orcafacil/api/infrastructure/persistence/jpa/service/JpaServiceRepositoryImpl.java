@@ -57,6 +57,18 @@ public class JpaServiceRepositoryImpl implements ServiceRepository {
     }
 
     @Override
+    public List<Service> findByCompanyId(Integer companyId) {
+        return repository
+                .findByCompanyId(companyId)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+
+
+
+    @Override
     public long countByCompanyId(Integer companyId) {
         return repository.countByCompanyId(companyId);
     }

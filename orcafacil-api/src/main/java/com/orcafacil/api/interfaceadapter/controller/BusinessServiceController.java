@@ -2,7 +2,9 @@ package com.orcafacil.api.interfaceadapter.controller;
 
 import com.orcafacil.api.application.service.service.BusinessServiceService;
 import com.orcafacil.api.domain.service.Service;
+import com.orcafacil.api.interfaceadapter.request.sevice.ServiceRequest;
 import com.orcafacil.api.interfaceadapter.response.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ public class BusinessServiceController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Service>> create(@RequestBody Service serviceRequest) {
+    public ResponseEntity<ApiResponse<Service>> create(@RequestBody @Valid ServiceRequest serviceRequest) { // ALTERADO AQUI
         Service created = service.create(serviceRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(true, "Serviço criado com sucesso.", created));
@@ -34,13 +36,17 @@ public class BusinessServiceController {
                         .body(new ApiResponse<>(false, "Serviço não encontrado.", null)));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/service/user/{userId}")
     public ResponseEntity<ApiResponse<List<Service>>> findByUserId(@PathVariable Integer userId) {
         List<Service> services = service.findByUserId(userId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do usuário listados.", services));
     }
 
-    // --- ENDPOINTS DE CONFIRMAÇÃO AJUSTADOS ---
+    @GetMapping("/service/company/{comapnyId}")
+    public ResponseEntity<ApiResponse<List<Service>>> findByComapanyId(@PathVariable Integer comapnyId) {
+        List<Service> services = service.findByComapanyId(comapnyId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do prestador listados.", services));
+    }
 
     @PostMapping("/{serviceId}/confirm-visit/{userId}")
     public ResponseEntity<ApiResponse<Service>> confirmVisit(
@@ -66,7 +72,6 @@ public class BusinessServiceController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Confirmação de materiais registrada.", updated));
     }
 
-
     @PostMapping("/{serviceId}/provider/{providerId}/accept")
     public ResponseEntity<ApiResponse<Service>> acceptService(
             @PathVariable Integer serviceId,
@@ -82,5 +87,6 @@ public class BusinessServiceController {
         Service updatedService = service.rejectService(serviceId, providerId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Serviço recusado com sucesso.", updatedService));
     }
+
 
 }

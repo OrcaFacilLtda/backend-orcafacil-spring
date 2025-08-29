@@ -66,6 +66,7 @@ public final class Service {
         this.budgetFinalized = budgetFinalized;
     }
 
+
     // Getters
     public Integer getId() { return id; }
     public User getUser() { return user; }
@@ -86,6 +87,38 @@ public final class Service {
     public Boolean getBudgetFinalized() { return budgetFinalized; }
 
     // Métodos with (imutáveis)
+
+    public Service withRequestDate(Date newRequestDate) {
+        return new Service(id, user, company, description, serviceStatus, newRequestDate, technicalVisitDate,
+                clientVisitConfirmed, providerVisitConfirmed, clientDatesConfirmed, providerDatesConfirmed,
+                clientMaterialsConfirmed, providerMaterialsConfirmed, negotiatedStartDate, negotiatedEndDate,
+                laborCost, budgetFinalized);
+    }
+
+
+    public Service withCompany(Company newCompany) {
+        return new Service(id, user, newCompany, description, serviceStatus, requestDate, technicalVisitDate,
+                clientVisitConfirmed, providerVisitConfirmed, clientDatesConfirmed, providerDatesConfirmed,
+                clientMaterialsConfirmed, providerMaterialsConfirmed, negotiatedStartDate, negotiatedEndDate,
+                laborCost, budgetFinalized);
+    }
+
+
+    public Service withUser(User newUser) {
+        return new Service(id, newUser, company, description, serviceStatus, requestDate, technicalVisitDate,
+                clientVisitConfirmed, providerVisitConfirmed, clientDatesConfirmed, providerDatesConfirmed,
+                clientMaterialsConfirmed, providerMaterialsConfirmed, negotiatedStartDate, negotiatedEndDate,
+                laborCost, budgetFinalized);
+    }
+
+    public Service withDescription(String newDescription) {
+        return new Service(id, user, company, newDescription, serviceStatus, requestDate, technicalVisitDate,
+                clientVisitConfirmed, providerVisitConfirmed, clientDatesConfirmed, providerDatesConfirmed,
+                clientMaterialsConfirmed, providerMaterialsConfirmed, negotiatedStartDate, negotiatedEndDate,
+                laborCost, budgetFinalized);
+    }
+
+
     public Service withServiceStatus(ServiceStatus newStatus) {
         return new Service(id, user, company, description, newStatus, requestDate, technicalVisitDate,
                 clientVisitConfirmed, providerVisitConfirmed, clientDatesConfirmed, providerDatesConfirmed,

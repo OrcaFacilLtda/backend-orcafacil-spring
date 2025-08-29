@@ -32,9 +32,10 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
     @Query(value = "UPDATE service SET visit_confirmed = true, status = 'Visita Confirmada' WHERE id = :id", nativeQuery = true)
     void confirmTechnicalVisit(@Param("id") Integer id);
 
-    @Query("SELECT s FROM ServiceEntity s WHERE s.client.id = :userId OR s.company.id = :userId")
+    @Query("SELECT s FROM ServiceEntity s WHERE s.client.id = :userId")
     List<ServiceEntity> findByUserId(@Param("userId") Integer userId);
     long countByCompanyId(Integer companyId);
+
 
     long countByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses);
 

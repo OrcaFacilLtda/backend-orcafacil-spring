@@ -8,6 +8,8 @@ import com.orcafacil.api.interfaceadapter.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/providers")
 public class ProviderController {
@@ -54,5 +56,11 @@ public class ProviderController {
     public ResponseEntity<ApiResponse<Void>> deleteById(@PathVariable Integer id) {
         service.deleteById(id);
         return ResponseEntity.ok(new ApiResponse<>(true, "Fornecedor deletado com sucesso.", null));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<List<Provider>>> findAllActive() {
+        List<Provider> activeProviders = service.findAllActive();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Prestadores ativos listados com sucesso.", activeProviders));
     }
 }

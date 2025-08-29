@@ -17,7 +17,6 @@ import com.orcafacil.api.domain.user.UserStatus;
 import com.orcafacil.api.domain.user.UserType;
 import com.orcafacil.api.interfaceadapter.request.provider.CreateProviderRequest;
 import com.orcafacil.api.interfaceadapter.request.provider.UpdateProviderRequest;
-import com.orcafacil.api.interfaceadapter.request.user.UserUpdateRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,7 +142,6 @@ public class ProviderService {
         Provider existingProvider = providerRepository.findById(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
 
-        // Update User if request data is present
         if (request.getUserUpdateRequest() != null) {
             userService.update(existingProvider.getUser().getId(), request.getUserUpdateRequest());
         }

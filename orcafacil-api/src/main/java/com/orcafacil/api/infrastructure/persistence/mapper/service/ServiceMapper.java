@@ -16,6 +16,7 @@ public class ServiceMapper {
 
         ServiceEntity entity = new ServiceEntity();
         entity.setId(service.getId());
+
         if (service.getUser() != null) {
             entity.setClient(UserMapper.toEntity(service.getUser()));
         }
@@ -46,12 +47,10 @@ public class ServiceMapper {
             return null;
         }
 
-        // A lógica de "hidratação" que implementamos no JpaServiceRepositoryImpl
-        // irá preencher os objetos User e Company posteriormente.
         return new Service(
                 entity.getId(),
-                null, // Será preenchido na camada de repositório
-                null, // Será preenchido na camada de repositório
+                entity.getClient() != null ? UserMapper.toDomain(entity.getClient()) : null,
+                entity.getCompany() != null ? CompanyMapper.toDomain(entity.getCompany()) : null,
                 entity.getDescription(),
                 entity.getStatus(),
                 entity.getRequestDate(),
