@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VisitNegotiationRepository {
+    VisitNegotiation save(VisitNegotiation visitNegotiation);
     void markAccepted(Integer id);
     Optional<VisitNegotiation> findAcceptedByBothSides(Integer serviceId);
     List<VisitNegotiation> findByServiceId(Integer serviceId);

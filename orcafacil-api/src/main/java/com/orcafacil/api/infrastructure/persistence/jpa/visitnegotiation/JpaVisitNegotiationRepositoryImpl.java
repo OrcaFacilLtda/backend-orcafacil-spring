@@ -2,6 +2,7 @@ package com.orcafacil.api.infrastructure.persistence.jpa.visitnegotiation;
 
 import com.orcafacil.api.domain.visitnegotiation.VisitNegotiation;
 import com.orcafacil.api.domain.visitnegotiation.VisitNegotiationRepository;
+import com.orcafacil.api.infrastructure.persistence.entity.visitnegotiation.VisitNegotiationEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.visitnegotiation.VisitNegotiationMapper;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,13 @@ public class JpaVisitNegotiationRepositoryImpl implements VisitNegotiationReposi
     public JpaVisitNegotiationRepositoryImpl(SpringVisitNegotiationRepository repository, VisitNegotiationMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public VisitNegotiation save(VisitNegotiation visitNegotiation) {
+        VisitNegotiationEntity entity = mapper.toEntity(visitNegotiation);
+        VisitNegotiationEntity savedEntity = repository.save(entity);
+        return mapper.toDomain(savedEntity);
     }
 
     @Override

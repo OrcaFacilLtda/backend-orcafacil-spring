@@ -2,6 +2,7 @@ package com.orcafacil.api.infrastructure.persistence.jpa.datenegotiation;
 
 import com.orcafacil.api.domain.datenegotiation.DateNegotiation;
 import com.orcafacil.api.domain.datenegotiation.DateNegotiationRepository;
+import com.orcafacil.api.infrastructure.persistence.entity.datenegotiation.DateNegotiationEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.datenegotiation.DateNegotiationMapper;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,13 @@ public class JpaDateNegotiationRepositoryImpl implements DateNegotiationReposito
     public JpaDateNegotiationRepositoryImpl(SpringDateNegotiationRepository repository, DateNegotiationMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
+    }
+
+    @Override
+    public DateNegotiation save(DateNegotiation dateNegotiation) {
+        DateNegotiationEntity entity = mapper.toEntity(dateNegotiation);
+        DateNegotiationEntity savedEntity = repository.save(entity);
+        return mapper.toDomain(savedEntity);
     }
 
     @Override

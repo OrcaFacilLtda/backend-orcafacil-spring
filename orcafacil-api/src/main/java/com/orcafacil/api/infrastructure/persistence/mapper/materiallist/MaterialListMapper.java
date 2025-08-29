@@ -2,25 +2,34 @@ package com.orcafacil.api.infrastructure.persistence.mapper.materiallist;
 
 import com.orcafacil.api.domain.materiallist.MaterialList;
 import com.orcafacil.api.infrastructure.persistence.entity.materiallist.MaterialListEntity;
+import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
+import org.springframework.stereotype.Component;
 
+@Component // 1. Transforma em um componente Spring
 public class MaterialListMapper {
 
-    public static MaterialListEntity toEntity(MaterialList domain) {
+    private final ServiceMapper serviceMapper; // 2. Injeta o ServiceMapper
+
+    public MaterialListMapper(ServiceMapper serviceMapper) {
+        this.serviceMapper = serviceMapper;
+    }
+
+    public MaterialListEntity toEntity(MaterialList domain) {
         if (domain == null) return null;
         return new MaterialListEntity(
                 domain.getId(),
-                domain.getService(),
+                serviceMapper.toEntity(domain.getService()),
                 domain.getNomeMaterial(),
                 domain.getQuantity(),
                 domain.getUnitPrice()
         );
     }
 
-    public static MaterialList toDomain(MaterialListEntity entity) {
+    public MaterialList toDomain(MaterialListEntity entity) {
         if (entity == null) return null;
         return new MaterialList(
                 entity.getId(),
-                entity.getService(),
+                serviceMapper.toDomain(entity.getService()),
                 entity.getNomeMaterial(),
                 entity.getQuantity(),
                 entity.getUnitPrice()

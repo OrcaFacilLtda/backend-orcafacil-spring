@@ -1,5 +1,6 @@
 package com.orcafacil.api.domain.materiallist;
 
+import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
 
 import java.math.BigDecimal;
@@ -8,12 +9,12 @@ import java.util.Objects;
 public class MaterialList {
 
     private final Integer id;
-    private final ServiceEntity service;
+    private final Service service;
     private final String nomeMaterial;
     private final Integer quantity;
     private final BigDecimal unitPrice;
 
-    public MaterialList(Integer id, ServiceEntity service, String nomeMaterial, Integer quantity, BigDecimal unitPrice) {
+    public MaterialList(Integer id, Service service, String nomeMaterial, Integer quantity, BigDecimal unitPrice) {
         this.id = id;
         this.service = service;
         this.nomeMaterial = nomeMaterial;
@@ -23,7 +24,7 @@ public class MaterialList {
 
     public Integer getId() {return id;}
 
-    public ServiceEntity getService() {return service;}
+    public Service getService() {return service;}
 
     public String getNomeMaterial() {return nomeMaterial;}
 
@@ -33,7 +34,7 @@ public class MaterialList {
 
     public MaterialList withId(Integer newId) {return new MaterialList(newId, service, nomeMaterial, quantity, unitPrice);}
 
-    public MaterialList withService(ServiceEntity newService) {return new MaterialList(id, newService, nomeMaterial, quantity, unitPrice);}
+    public MaterialList withService(Service newService) {return new MaterialList(id, newService, nomeMaterial, quantity, unitPrice);}
 
     public MaterialList withNomeMaterial(String newNomeMaterial) {return new MaterialList(id, service, newNomeMaterial, quantity, unitPrice);}
 
