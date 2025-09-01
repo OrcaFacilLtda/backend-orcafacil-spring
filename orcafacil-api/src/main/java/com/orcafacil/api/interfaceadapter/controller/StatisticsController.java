@@ -18,7 +18,6 @@ public class StatisticsController {
         this.statisticsService = statisticsService;
     }
 
-    // --- ENDPOINTS DO ADMINISTRADOR ---
 
     @GetMapping("/admin")
     public ResponseEntity<ApiResponse<AdminDashboardStats>> getAdminDashboardStats() {
@@ -32,7 +31,6 @@ public class StatisticsController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Dados dos gráficos do admin recuperados.", chartData));
     }
 
-    // --- ENDPOINTS DO PRESTADOR ---
 
     @GetMapping("/provider/{companyId}")
     public ResponseEntity<ApiResponse<ProviderStats>> getProviderStats(@PathVariable Integer companyId) {

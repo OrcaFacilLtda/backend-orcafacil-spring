@@ -35,7 +35,6 @@ public class StatisticsService {
         AdminDashboardStats stats = new AdminDashboardStats();
         stats.setTotalUsers(userService.countTotalUsers());
         stats.setActiveProviders(userService.countActiveProviders());
-        // stats.setCompletedServicesThisMonth(businessService.countServicesByStatus(ServiceStatus.COMPLETED));
         return stats;
     }
 
@@ -48,7 +47,7 @@ public class StatisticsService {
         List<User> allUsers = userService.findAll();
         if (allUsers != null && !allUsers.isEmpty()) {
             Map<String, Long> usersByMonth = allUsers.stream()
-                    .filter(user -> user.getBirthDate() != null) // Evita erro se a data for nula
+                    .filter(user -> user.getBirthDate() != null)
                     .collect(Collectors.groupingBy(
                             user -> sdf.format(user.getBirthDate()),
                             Collectors.counting()
@@ -57,16 +56,11 @@ public class StatisticsService {
             chartData.setUserRegistrationData(new ArrayList<>(usersByMonth.values()));
         }
 
-        // Lógica para Serviços por Categoria
         List<Service> allServices = businessService.findAll();
         if (allServices != null && !allServices.isEmpty()) {
-            // Para obter a categoria, precisamos buscar o Provider associado ao serviço
-            // Esta é uma operação mais complexa e o ideal seria otimizar com uma query específica
-            Map<String, Long> servicesByCategory = allServices.stream()
+             Map<String, Long> servicesByCategory = allServices.stream()
                     .map(service -> {
-                        // Simula a busca do Provider para obter a categoria
-                        // Numa app real, isto seria otimizado
-                        Provider provider = businessService.findProviderByCompanyId(service.getCompany().getId());
+                         Provider provider = businessService.findProviderByCompanyId(service.getCompany().getId());
                         return provider;
                     })
                     .filter(provider -> provider != null && provider.getCategory() != null)

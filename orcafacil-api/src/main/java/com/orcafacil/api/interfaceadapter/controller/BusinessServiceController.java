@@ -5,7 +5,6 @@ import com.orcafacil.api.domain.datenegotiation.DateNegotiation;
 import com.orcafacil.api.domain.materiallist.MaterialList;
 import com.orcafacil.api.domain.service.Service;
 import com.orcafacil.api.domain.visitnegotiation.VisitNegotiation;
-// ✅ Import do novo request que será mantido
 import com.orcafacil.api.interfaceadapter.request.sevice.DateRangeProposalRequest;
 import com.orcafacil.api.interfaceadapter.request.sevice.*;
 import com.orcafacil.api.interfaceadapter.response.ApiResponse;
@@ -108,7 +107,6 @@ public class BusinessServiceController {
                 new ApiResponse<>(true, "Proposta de visita enviada com sucesso.", visitNegotiation));
     }
 
-    // ✅ APENAS ESTA VERSÃO DO MÉTODO DEVE EXISTIR
     @PostMapping("/{serviceId}/propose-dates")
     public ResponseEntity<ApiResponse<DateNegotiation>> sendDateProposal(
             @PathVariable Integer serviceId, @RequestBody @Valid DateRangeProposalRequest request) {
@@ -118,11 +116,17 @@ public class BusinessServiceController {
     }
 
     @PostMapping("/{serviceId}/materials")
-    public ResponseEntity<ApiResponse<List<MaterialList>>> sendMaterialList(
+    public ResponseEntity<ApiResponse<Service>> sendMaterialList(
             @PathVariable Integer serviceId, @RequestBody @Valid MaterialRequest request) {
-        List<MaterialList> materialList = service.sendMaterialList(serviceId, request.materials());
+        Service updatedService = service.sendMaterialList(serviceId, request.materials());
         return ResponseEntity.ok(
-                new ApiResponse<>(true, "Lista de materiais enviada com sucesso.", materialList));
+                new ApiResponse<>(true, "Lista de materiais enviada com sucesso.", updatedService));
+    }
+
+    @GetMapping("/{serviceId}/materials")
+    public ResponseEntity<ApiResponse<List<MaterialList>>> getMaterialsByServiceId(@PathVariable Integer serviceId) {
+        List<MaterialList> materials = service.findMaterialsByServiceId(serviceId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de materiais recuperada.", materials));
     }
 
     @PostMapping("/{serviceId}/request-revision")

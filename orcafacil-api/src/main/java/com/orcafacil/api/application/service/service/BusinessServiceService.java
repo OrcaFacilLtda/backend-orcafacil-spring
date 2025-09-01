@@ -94,6 +94,9 @@ public class BusinessServiceService {
         return dateNegotiationRepository.findByServiceId(serviceId);
     }
 
+    public List<MaterialList> findMaterialsByServiceId(Integer serviceId) {
+        return materialListRepository.findByServiceId(serviceId);
+    }
 
     public long countServicesByCompanyId(Integer companyId) { return serviceRepository.countByCompanyId(companyId); }
     public long countServicesByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses) { return serviceRepository.countByCompanyIdAndStatusNotIn(companyId, excludedStatuses); }
@@ -190,36 +193,55 @@ public class BusinessServiceService {
     @Transactional
     public VisitNegotiation sendVisitProposal(Integer serviceId, VisitProposalRequest request) {
         Service service = getServiceOrThrow(serviceId);
-        VisitNegotiation visitNegotiation = new VisitNegotiation(null, service, request.proposerRole(), request.date(), LocalDateTime.now(), false);
+
+        if (service.getServiceStatus() != ServiceStatus.NEGOTIATING_VISIT) {
+            throw new IllegalStateException("A negociação/visita só pode iniciar após o prestador aceitar o serviço.");
+        }
+
+        VisitNegotiation visitNegotiation = new VisitNegotiation(
+                null,
+                service,
+                request.proposerRole(),
+                request.date(),
+                LocalDateTime.now(),
+                false
+        );
         return visitNegotiationRepository.save(visitNegotiation);
     }
 
     @Transactional
-    public DateNegotiation sendDateProposal(Integer serviceId, DateProposalRequest request) {
+    public Service sendMaterialList(Integer serviceId, List<MaterialRequest.MaterialItem> materials) {
         Service service = getServiceOrThrow(serviceId);
-        DateNegotiation dateNegotiation = new DateNegotiation(null, service, request.proposerRole(), request.date(), null, LocalDateTime.now(), false);
-        return dateNegotiationRepository.save(dateNegotiation);
-    }
 
-    @Transactional
-    public List<MaterialList> sendMaterialList(Integer serviceId, List<MaterialRequest.MaterialItem> materials) {
-        Service service = getServiceOrThrow(serviceId);
         List<MaterialList> materialLists = materials.stream()
                 .map(item -> new MaterialList(null, service, item.name(), item.quantity(), item.unitPrice()))
                 .collect(Collectors.toList());
-        return materialListRepository.saveAll(materialLists);
+        materialListRepository.saveAll(materialLists);
+
+        Service updatedService = service.withProviderMaterialsConfirmed(true)
+                .withServiceStatus(ServiceStatus.BUDGET_IN_NEGOTIATION); // Atualiza o status
+
+        return serviceRepository.save(updatedService);
     }
 
+    // ✅ MÉTODO ATUALIZADO AQUI
     @Transactional
     public Service requestBudgetRevision(Integer serviceId, Integer clientId) {
         Service service = getServiceOrThrow(serviceId);
         User client = getUserOrThrow(clientId);
+
         if (!service.getUser().getId().equals(clientId)) {
             throw new IllegalStateException("Apenas o cliente responsável pode solicitar a revisão.");
         }
+
+        materialListRepository.deleteByServiceId(serviceId);
+
         BudgetRevisionRequest revisionRequest = new BudgetRevisionRequest(null, service, client, LocalDateTime.now());
         revisionRequestRepository.save(revisionRequest);
+
         Service updatedService = service.withServiceStatus(ServiceStatus.BUDGET_REVISION_REQUESTED);
+        updatedService = updatedService.withClientMaterialsConfirmed(false).withProviderMaterialsConfirmed(false);
+
         return serviceRepository.save(updatedService);
     }
 
@@ -227,12 +249,17 @@ public class BusinessServiceService {
     public Service finalizeAndEvaluate(Integer serviceId, Integer clientId, int stars) {
         Service service = getServiceOrThrow(serviceId);
         User client = getUserOrThrow(clientId);
+
         if (!service.getUser().getId().equals(clientId)) {
             throw new IllegalStateException("Apenas o cliente do serviço pode finalizá-lo e avaliá-lo.");
         }
+
         Evaluation evaluation = new Evaluation(null, service, stars, LocalDateTime.now());
         evaluationRepository.save(evaluation);
-        Service updatedService = service.withServiceStatus(ServiceStatus.COMPLETED);
+
+        Service updatedService = service.withServiceStatus(ServiceStatus.COMPLETED)
+                .withBudgetFinalized(true);
+
         return serviceRepository.save(updatedService);
     }
 

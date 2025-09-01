@@ -35,4 +35,9 @@ public class JpaMaterialListRepositoryImpl implements MaterialListRepository {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteByServiceId(Integer serviceId) {
+        repository.deleteByServiceId(serviceId);
+    }
 }
