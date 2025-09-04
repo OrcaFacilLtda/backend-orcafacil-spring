@@ -3,6 +3,7 @@ package com.orcafacil.api.infrastructure.persistence.jpa.service;
 import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,5 +51,13 @@ public interface SpringDataServiceRepository extends JpaRepository<ServiceEntity
     List<ServiceEntity> findByCompanyIdAndStatusInAndDate(@Param("companyId") Integer companyId, @Param("statuses") List<ServiceStatus> statuses);
 
     long countByStatus(ServiceStatus status);
+
+    @Query("SELECT COUNT(s) FROM ServiceEntity s WHERE s.status = :status AND s.requestDate BETWEEN :startDate AND :endDate")
+    long countByStatusAndRequestDateBetween(
+            @Param("status") ServiceStatus status,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate
+    );
+
 
 }

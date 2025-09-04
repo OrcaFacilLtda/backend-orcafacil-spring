@@ -6,7 +6,6 @@ public class AdminDashboardStats {
     private long activeProviders;
     private long completedServicesThisMonth;
 
-    // Getters e Setters
     public long getTotalUsers() {
         return totalUsers;
     }

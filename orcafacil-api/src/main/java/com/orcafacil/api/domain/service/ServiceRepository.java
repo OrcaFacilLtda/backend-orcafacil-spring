@@ -1,5 +1,6 @@
 package com.orcafacil.api.domain.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ public interface ServiceRepository {
     List<Service> findByCompanyId(Integer companyId);
     long countByCompanyId(Integer companyId);
     long countByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses);
+    long countByServiceStatusAndRequestDateBetween(ServiceStatus serviceStatus, Date startDate, Date endDate);
     Double findAverageRatingByCompanyId(Integer companyId);
     List<Service> findByCompanyIdAndStatus(Integer companyId, ServiceStatus status);
     List<Service> findByCompanyIdAndStatusIn(Integer companyId, List<ServiceStatus> statuses);

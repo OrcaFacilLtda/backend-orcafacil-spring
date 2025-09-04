@@ -80,6 +80,12 @@ public class BusinessServiceService {
     }
 
 
+    @Transactional(readOnly = true)
+    public long countServicesByStatusAndDateRange(ServiceStatus status, Date startDate, Date endDate) {
+        return serviceRepository.countByServiceStatusAndRequestDateBetween(status, startDate, endDate);
+    }
+
+
     public Optional<Service> findById(Integer id) { return serviceRepository.findById(id); }
     public List<Service> findAll() { return serviceRepository.findAll(); }
     public List<Service> findByUserId(Integer userId) { return serviceRepository.findByUserId(userId); }
@@ -224,7 +230,6 @@ public class BusinessServiceService {
         return serviceRepository.save(updatedService);
     }
 
-    // ✅ MÉTODO ATUALIZADO AQUI
     @Transactional
     public Service requestBudgetRevision(Integer serviceId, Integer clientId) {
         Service service = getServiceOrThrow(serviceId);

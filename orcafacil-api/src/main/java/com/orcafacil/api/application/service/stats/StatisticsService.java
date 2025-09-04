@@ -13,10 +13,9 @@ import com.orcafacil.api.interfaceadapter.response.ProviderStats;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
@@ -35,6 +34,18 @@ public class StatisticsService {
         AdminDashboardStats stats = new AdminDashboardStats();
         stats.setTotalUsers(userService.countTotalUsers());
         stats.setActiveProviders(userService.countActiveProviders());
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime firstDayOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime lastDayOfMonth = now.withDayOfMonth(now.toLocalDate().lengthOfMonth())
+                .withHour(23).withMinute(59).withSecond(59).withNano(999_999_999);
+
+        Date startDate = Date.from(firstDayOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(lastDayOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        long completedThisMonth = businessService.countServicesByStatusAndDateRange(ServiceStatus.COMPLETED, startDate, endDate);
+        stats.setCompletedServicesThisMonth(completedThisMonth);
+
         return stats;
     }
 
@@ -43,7 +54,6 @@ public class StatisticsService {
         AdminChartData chartData = new AdminChartData();
         SimpleDateFormat sdf = new SimpleDateFormat("MMM/yyyy");
 
-        // Lógica para Utilizadores por Mês
         List<User> allUsers = userService.findAll();
         if (allUsers != null && !allUsers.isEmpty()) {
             Map<String, Long> usersByMonth = allUsers.stream()

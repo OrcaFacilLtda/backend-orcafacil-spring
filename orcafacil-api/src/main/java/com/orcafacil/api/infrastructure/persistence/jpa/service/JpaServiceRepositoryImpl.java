@@ -6,6 +6,7 @@ import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.infrastructure.persistence.entity.service.ServiceEntity;
 import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -77,6 +78,12 @@ public class JpaServiceRepositoryImpl implements ServiceRepository {
     public long countByCompanyIdAndStatusNotIn(Integer companyId, List<ServiceStatus> excludedStatuses) {
         return repository.countByCompanyIdAndStatusNotIn(companyId, excludedStatuses);
     }
+
+    @Override
+    public long countByServiceStatusAndRequestDateBetween(ServiceStatus serviceStatus, Date startDate, Date endDate) {
+        return repository.countByStatusAndRequestDateBetween(serviceStatus, startDate, endDate);
+    }
+
 
     @Override
     public Double findAverageRatingByCompanyId(Integer companyId) {
