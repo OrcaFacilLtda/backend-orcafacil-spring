@@ -24,36 +24,12 @@ public class BusinessServiceController {
         this.service = service;
     }
 
-    // --- Endpoints de Gerenciamento Básico de Serviços ---
-
     @PostMapping
     public ResponseEntity<ApiResponse<Service>> create(@RequestBody @Valid ServiceRequest serviceRequest) {
         Service created = service.create(serviceRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(true, "Serviço criado com sucesso.", created));
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Service>> findById(@PathVariable Integer id) {
-        return service.findById(id)
-                .map(s -> ResponseEntity.ok(new ApiResponse<>(true, "Serviço encontrado.", s)))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ApiResponse<>(false, "Serviço não encontrado.", null)));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<Service>>> findByUserId(@PathVariable Integer userId) {
-        List<Service> services = service.findByUserId(userId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do usuário listados.", services));
-    }
-
-    @GetMapping("/company/{companyId}")
-    public ResponseEntity<ApiResponse<List<Service>>> findByCompanyId(@PathVariable Integer companyId) {
-        List<Service> services = service.findByComapanyId(companyId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do prestador listados.", services));
-    }
-
-    // --- Endpoints de Aceite/Recusa de Serviço ---
 
     @PostMapping("/{serviceId}/provider/{providerId}/accept")
     public ResponseEntity<ApiResponse<Service>> acceptService(
@@ -71,7 +47,6 @@ public class BusinessServiceController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Serviço recusado com sucesso.", updatedService));
     }
 
-    // --- Endpoints de Confirmação de Etapas (Ações Bilaterais) ---
 
     @PostMapping("/{serviceId}/confirm-visit/{userId}")
     public ResponseEntity<ApiResponse<Service>> confirmVisit(
@@ -97,7 +72,6 @@ public class BusinessServiceController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Confirmação de materiais registrada.", updated));
     }
 
-    // --- Endpoints para Propostas e Interações do Processo ---
 
     @PostMapping("/{serviceId}/propose-visit")
     public ResponseEntity<ApiResponse<VisitNegotiation>> sendVisitProposal(
@@ -123,12 +97,6 @@ public class BusinessServiceController {
                 new ApiResponse<>(true, "Lista de materiais enviada com sucesso.", updatedService));
     }
 
-    @GetMapping("/{serviceId}/materials")
-    public ResponseEntity<ApiResponse<List<MaterialList>>> getMaterialsByServiceId(@PathVariable Integer serviceId) {
-        List<MaterialList> materials = service.findMaterialsByServiceId(serviceId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de materiais recuperada.", materials));
-    }
-
     @PostMapping("/{serviceId}/request-revision")
     public ResponseEntity<ApiResponse<Service>> requestBudgetRevision(
             @PathVariable Integer serviceId, @RequestParam Integer clientId) {
@@ -144,6 +112,34 @@ public class BusinessServiceController {
             @RequestBody @Valid EvaluationRequest request) {
         Service updatedService = service.finalizeAndEvaluate(serviceId, clientId, request.getStars());
         return ResponseEntity.ok(new ApiResponse<>(true, "Avaliação enviada com sucesso.", updatedService));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Service>> findById(@PathVariable Integer id) {
+        return service.findById(id)
+                .map(s -> ResponseEntity.ok(new ApiResponse<>(true, "Serviço encontrado.", s)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiResponse<>(false, "Serviço não encontrado.", null)));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<List<Service>>> findByUserId(@PathVariable Integer userId) {
+        List<Service> services = service.findByUserId(userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do usuário listados.", services));
+    }
+
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<ApiResponse<List<Service>>> findByCompanyId(@PathVariable Integer companyId) {
+        List<Service> services = service.findByComapanyId(companyId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do prestador listados.", services));
+    }
+
+
+
+    @GetMapping("/{serviceId}/materials")
+    public ResponseEntity<ApiResponse<List<MaterialList>>> getMaterialsByServiceId(@PathVariable Integer serviceId) {
+        List<MaterialList> materials = service.findMaterialsByServiceId(serviceId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de materiais recuperada.", materials));
     }
 
     @GetMapping("/{serviceId}/visit-proposals")

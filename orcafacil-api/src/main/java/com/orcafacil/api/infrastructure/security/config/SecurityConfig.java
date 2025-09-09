@@ -33,7 +33,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -82,15 +81,20 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/login", "/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users", "/api/providers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                        .requestMatchers("/admin/**").permitAll()
+                        .requestMatchers("/api/providers/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/client/**").hasRole("CLIENT")
+                        .requestMatchers("/provider/**").hasRole("PROVIDER")
+
                         .anyRequest().authenticated()
                 )
-                .logout(logout -> logout.disable()) // DESABILITA o logout padrão do Spring Security
+                .logout(logout -> logout.disable())
                 .addFilterBefore(jwtFilter,
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

@@ -52,7 +52,7 @@ public class Provider {
         return category;
     }
 
-    // Métodos withX para imutabilidade
+    // Métodos withX
     public Provider withUser(User newUser) {
         return new Provider(newUser, this.company, this.category);
     }

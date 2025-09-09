@@ -9,6 +9,7 @@ import com.orcafacil.api.interfaceadapter.response.ApiResponse;
 import com.orcafacil.api.interfaceadapter.response.UserResponse;
 import com.orcafacil.api.infrastructure.security.jwt.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +29,22 @@ public class UserController {
         this.tokenService = tokenService;
     }
 
+
+
     @PostMapping
     public ResponseEntity<ApiResponse<User>> create(@RequestBody UserRequest request) {
         User created = userService.create(request);
         return ResponseEntity.status(201)
                 .body(new ApiResponse<>(true, "Usuário criado com sucesso.", created));
+    }
+
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<User> updateUserByAdmin(
+            @PathVariable Integer id,
+          @RequestBody UserUpdateRequest request) {
+
+        User updatedUser = userService.updateByAdmin(id, request);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @PutMapping("/{id}")

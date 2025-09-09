@@ -38,7 +38,7 @@ public class DateNegotiation {
 
     public Boolean getAccepted() {return accepted;}
 
-
+    // Métodos withX
     public DateNegotiation withService(Service newService){
         return new DateNegotiation(id,newService,propeser,startDate,endDate,sentDate,accepted);
     }

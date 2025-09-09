@@ -34,6 +34,7 @@ public class VisitNegotiation {
 
     public Boolean getAccept() {return accept;}
 
+    // Métodos withX
     public VisitNegotiation withService(Service newService){
         return  new VisitNegotiation(id,newService,propeser,visitDate,sentDate,accept);
     }

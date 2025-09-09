@@ -1,7 +1,5 @@
 package com.orcafacil.api.domain.company;
 
-import com.orcafacil.api.infrastructure.persistence.entity.company.CompanyEntity;
-
 import java.util.List;
 import java.util.Optional;
 

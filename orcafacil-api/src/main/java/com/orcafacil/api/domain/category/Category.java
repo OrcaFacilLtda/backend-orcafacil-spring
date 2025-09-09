@@ -43,6 +43,7 @@ public class Category {
         return description;
     }
 
+    // Métodos withX
     public Category withId(Integer newId) {
         return new Category(newId, name, description);
     }

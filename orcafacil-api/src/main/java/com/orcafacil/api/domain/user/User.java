@@ -130,7 +130,7 @@ public class User {
         }
     }
 
-
+    // Métodos withX
     public User withName(String newName) {
         return new User(id, newName, phone, email, password, cpf, userType, birthDate, status, address);
     }

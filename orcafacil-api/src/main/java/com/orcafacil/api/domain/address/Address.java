@@ -40,7 +40,6 @@ public class Address {
             throw new DomainException("CEP é obrigatório.");
         }
 
-        // Remove todos os caracteres que não são dígitos (ex: hífen, espaço, etc)
         String cleanZip = zipCode.replaceAll("\\D", "");
 
         if (!cleanZip.matches("\\d{8}")) {
@@ -122,7 +121,7 @@ public class Address {
         return complement;
     }
 
-    // Métodos with* para imutabilidade
+    // Métodos withX
     public Address withId(Integer newId) {
         return new Address(newId, zipCode, street, number, neighborhood, city, state, complement);
     }

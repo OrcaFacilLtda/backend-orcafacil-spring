@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DateNegotiationRepository {
-    DateNegotiation save(DateNegotiation dateNegotiation); // <-- MÉTODO ADICIONADO
+    DateNegotiation save(DateNegotiation dateNegotiation);
     void markAccepted(Integer id);
     Optional<DateNegotiation> findAcceptedByBothSides(Integer serviceId);
     List<DateNegotiation> findByServiceId(Integer serviceId);

@@ -70,6 +70,7 @@ public class Company {
         return new Date(createdAt.getTime());
     }
 
+    // Métodos withX
     public Company withId(Integer newId) {
         return new Company(newId, legalName, cnpj, address, createdAt);
     }

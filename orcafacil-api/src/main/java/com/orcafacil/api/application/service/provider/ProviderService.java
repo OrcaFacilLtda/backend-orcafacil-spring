@@ -98,21 +98,59 @@ public class ProviderService {
         return providerRepository.save(provider);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Provider> findById(Integer id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido para busca.");
+    @Transactional
+    public Provider updateByAdmin(Integer providerId, UpdateProviderRequest request) {
+        if (providerId == null || providerId <= 0) {
+            throw new IllegalArgumentException("ID do provider inválido.");
         }
-        return providerRepository.findById(id);
+
+        Provider existingProvider = providerRepository.findById(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
+
+        if (request.getUserUpdateRequest() != null) {
+            userService.updateByAdmin(existingProvider.getUser().getId(), request.getUserUpdateRequest());
+        }
+
+        if (request.getCompanyUpdateRequest() != null) {
+            companyService.update(request.getCompanyUpdateRequest());
+        }
+
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(existingProvider.getCategory().getId())) {
+            Category newCategory = categoryService.findById(request.getCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+            Provider updatedProvider = existingProvider.withCategory(newCategory);
+            return providerRepository.save(updatedProvider);
+        }
+
+        return existingProvider;
+    }
+    @Transactional
+    public Provider update(Integer providerId, UpdateProviderRequest request) {
+        if (providerId == null || providerId <= 0) {
+            throw new IllegalArgumentException("ID do provider inválido.");
+        }
+
+        Provider existingProvider = providerRepository.findById(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
+
+        if (request.getUserUpdateRequest() != null) {
+            userService.update(existingProvider.getUser().getId(), request.getUserUpdateRequest());
+        }
+
+        if (request.getCompanyUpdateRequest() != null) {
+            companyService.update(request.getCompanyUpdateRequest());
+        }
+
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(existingProvider.getCategory().getId())) {
+            Category newCategory = categoryService.findById(request.getCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+            Provider updatedProvider = existingProvider.withCategory(newCategory);
+            return providerRepository.save(updatedProvider);
+        }
+
+        return existingProvider;
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Provider> findByCompanyId(Integer companyId) {
-        if (companyId == null || companyId <= 0) {
-            throw new IllegalArgumentException("ID da empresa inválido para busca.");
-        }
-        return providerRepository.findByCompanyId(companyId);
-    }
 
     @Transactional
     public void deleteById(Integer providerId) {
@@ -132,34 +170,23 @@ public class ProviderService {
         providerRepository.deleteById(providerId);
     }
 
-
-    @Transactional
-    public Provider update(Integer providerId, UpdateProviderRequest request) {
-        if (providerId == null || providerId <= 0) {
-            throw new IllegalArgumentException("ID do provider inválido.");
+    @Transactional(readOnly = true)
+    public Optional<Provider> findById(Integer id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("ID inválido para busca.");
         }
-
-        Provider existingProvider = providerRepository.findById(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("Provider não encontrado"));
-
-        if (request.getUserUpdateRequest() != null) {
-            userService.update(existingProvider.getUser().getId(), request.getUserUpdateRequest());
-        }
-
-        // Update Company if request data is present
-        if (request.getCompanyUpdateRequest() != null) {
-            companyService.update(request.getCompanyUpdateRequest());
-        }
-
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(existingProvider.getCategory().getId())) {
-            Category newCategory = categoryService.findById(request.getCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
-            Provider updatedProvider = existingProvider.withCategory(newCategory);
-            return providerRepository.save(updatedProvider);
-        }
-
-        return existingProvider;
+        return providerRepository.findById(id);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<Provider> findByCompanyId(Integer companyId) {
+        if (companyId == null || companyId <= 0) {
+            throw new IllegalArgumentException("ID da empresa inválido para busca.");
+        }
+        return providerRepository.findByCompanyId(companyId);
+    }
+
+
 
 
     @Transactional(readOnly = true)

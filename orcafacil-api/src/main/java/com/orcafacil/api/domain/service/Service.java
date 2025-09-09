@@ -15,7 +15,6 @@ public final class Service {
     private final Date requestDate;
     private final Date technicalVisitDate;
 
-    // Confirmações bilaterais
     private final Boolean clientVisitConfirmed;
     private final Boolean providerVisitConfirmed;
     private final Boolean clientDatesConfirmed;
@@ -86,8 +85,7 @@ public final class Service {
     public BigDecimal getLaborCost() { return laborCost; }
     public Boolean getBudgetFinalized() { return budgetFinalized; }
 
-    // Métodos with (imutáveis)
-
+    // Métodos withX
     public Service withRequestDate(Date newRequestDate) {
         return new Service(id, user, company, description, serviceStatus, newRequestDate, technicalVisitDate,
                 clientVisitConfirmed, providerVisitConfirmed, clientDatesConfirmed, providerDatesConfirmed,

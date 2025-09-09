@@ -25,13 +25,15 @@ public class UserService {
     private final AddressService addressService;
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
-    private final ServiceRepository serviceRepository; // ADICIONADO
+    private final ServiceRepository serviceRepository;
+
 
     public UserService(UserRepository userRepository,
                        AddressService addressService,
                        Validator validator,
                        PasswordEncoder passwordEncoder,
-                       ServiceRepository serviceRepository) { // ADICIONADO
+                       ServiceRepository serviceRepository) {
+
         this.userRepository = userRepository;
         this.addressService = addressService;
         this.validator = validator;
@@ -137,6 +139,60 @@ public class UserService {
     }
 
     @Transactional
+    public User updateByAdmin(Integer id, UserUpdateRequest request) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("ID do usuário inválido.");
+        }
+
+        Set<ConstraintViolation<UserUpdateRequest>> violations = validator.validate(request);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException("Dados de atualização inválidos", violations);
+        }
+
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+            existingUser = existingUser.withName(request.getName());
+        }
+        if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
+            existingUser = existingUser.withPhone(request.getPhone());
+        }
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            existingUser = existingUser.withEmail(request.getEmail());
+        }
+        if (request.getCpf() != null && request.getCpf().matches("\\d{11}")) {
+            existingUser = existingUser.withCpf(request.getCpf());
+        }
+        if (request.getUserType() != null && !request.getUserType().trim().isEmpty()) {
+            existingUser = existingUser.withUserType(UserType.valueOf(request.getUserType()));
+        }
+        if (request.getBirthDate() != null) {
+            existingUser = existingUser.withBirthDate(request.getBirthDate());
+        }
+        if (request.getStatus() != null && !request.getStatus().trim().isEmpty()) {
+            existingUser = existingUser.withStatus(UserStatus.valueOf(request.getStatus()));
+        }
+
+        if (request.getAddress() != null) {
+            Address updatedAddress;
+            if (request.getAddress().getId() != null) {
+                updatedAddress = addressService.updateAddress(request.getAddress());
+            } else {
+                updatedAddress = addressService.createAddress(request.getAddress());
+            }
+            existingUser = existingUser.withAddress(updatedAddress);
+        }
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            existingUser = existingUser.withPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        return userRepository.update(existingUser);
+    }
+
+
+    @Transactional
     public void delete(Integer id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID do usuário inválido.");
@@ -155,7 +211,7 @@ public class UserService {
             userRepository.deleteById(id);
     }
 
-    // --- Métodos de Consulta ---
+
 
     public Optional<User> findById(Integer id) {
         if (id == null || id <= 0) throw new IllegalArgumentException("ID inválido.");
