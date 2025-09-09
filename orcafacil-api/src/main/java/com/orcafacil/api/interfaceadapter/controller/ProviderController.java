@@ -7,7 +7,6 @@ import com.orcafacil.api.interfaceadapter.request.provider.UpdateProviderRequest
 import com.orcafacil.api.interfaceadapter.response.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,23 +50,10 @@ public class ProviderController {
             return ResponseEntity.ok(new ApiResponse<>(true, "Fornecedor atualizado pelo admin com sucesso.", updatedProvider));
 
         } catch (IllegalArgumentException ex) {
-            // Loga o erro como um aviso (WARN) pois é um erro de dados do cliente (400)
             logger.warn("Requisição inválida para atualizar provider ID {}: {}", providerId, ex.getMessage());
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, ex.getMessage(), null));
 
-        } catch (DataIntegrityViolationException ex) {
-            // Sugestão: Captura erros de violação de constraint (ex: CNPJ duplicado)
-            logger.error("Violação de dados ao tentar atualizar provider ID {}", providerId, ex);
-            return ResponseEntity.status(409) // 409 Conflict é mais apropriado
-                    .body(new ApiResponse<>(false, "Erro de dados: já existe um registro com as informações fornecidas.", null));
-
-        } catch (Exception ex) {
-            // 2. Loga o erro inesperado (500) com detalhes completos
-            logger.error("Erro inesperado ao atualizar provider ID {}", providerId, ex);
-
-            return ResponseEntity.status(500)
-                    .body(new ApiResponse<>(false, "Ocorreu um erro inesperado no servidor. Tente novamente mais tarde.", null));
         }
     }
 

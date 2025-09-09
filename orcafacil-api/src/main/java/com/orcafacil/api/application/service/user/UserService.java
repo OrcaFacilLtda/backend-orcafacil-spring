@@ -2,8 +2,8 @@ package com.orcafacil.api.application.service.user;
 
 import com.orcafacil.api.application.service.address.AddressService;
 import com.orcafacil.api.domain.address.Address;
-import com.orcafacil.api.domain.service.ServiceRepository; // IMPORTADO
-import com.orcafacil.api.domain.service.ServiceStatus;   // IMPORTADO
+import com.orcafacil.api.domain.service.ServiceRepository;
+import com.orcafacil.api.domain.service.ServiceStatus;
 import com.orcafacil.api.domain.user.*;
 import com.orcafacil.api.interfaceadapter.request.user.UserRequest;
 import com.orcafacil.api.interfaceadapter.request.user.UserUpdateRequest;
