@@ -12,10 +12,10 @@ public class ProviderStats {
     private List<Service> acceptedToday;
     private List<Service> pendingServices;
 
-    // Construtores, Getters e Setters
 
     public ProviderStats() {}
 
+    // Getters e setters
     public long getTotalServices() {
         return totalServices;
     }

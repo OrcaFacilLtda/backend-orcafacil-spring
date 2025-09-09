@@ -38,6 +38,7 @@ public class MaterialListEntity {
         this.unitPrice = unitPrice;
     }
 
+    // Getters e setters
     public Integer getId() {
         return id;
     }

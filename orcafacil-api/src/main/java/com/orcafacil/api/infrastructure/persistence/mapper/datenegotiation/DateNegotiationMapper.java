@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 @Component // <-- Adicionado
 public class DateNegotiationMapper {
 
-    private final ServiceMapper serviceMapper; // <-- Dependência
+    private final ServiceMapper serviceMapper;
 
     public DateNegotiationMapper(ServiceMapper serviceMapper) { // <-- Injeção
         this.serviceMapper = serviceMapper;
     }
 
-    public DateNegotiationEntity toEntity(DateNegotiation domain) { // <-- 'static' removido
+    public DateNegotiationEntity toEntity(DateNegotiation domain) {
         if (domain == null) return null;
         return new DateNegotiationEntity(
                 domain.getId(),
-                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
+                serviceMapper.toEntity(domain.getService()),
                 domain.getPropeser(),
                 domain.getStartDate(),
                 domain.getEndDate(),
@@ -27,11 +27,11 @@ public class DateNegotiationMapper {
         );
     }
 
-    public DateNegotiation toDomain(DateNegotiationEntity entity) { // <-- 'static' removido
+    public DateNegotiation toDomain(DateNegotiationEntity entity) {
         if (entity == null) return null;
         return new DateNegotiation(
                 entity.getId(),
-                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
+                serviceMapper.toDomain(entity.getService()),
                 entity.getProposer(),
                 entity.getStartDate(),
                 entity.getEndDate(),

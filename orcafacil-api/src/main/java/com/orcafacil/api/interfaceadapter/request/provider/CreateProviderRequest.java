@@ -15,6 +15,7 @@ public class CreateProviderRequest {
     @NotNull(message = "Categoria é obrigatória")
     private Integer categoryId;
 
+    // Getters e setters
     public UserRequest getUserRequest() { return userRequest; }
 
     public void setUserRequest(UserRequest userRequest) { this.userRequest = userRequest; }

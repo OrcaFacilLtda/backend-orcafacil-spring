@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class VisitNegotiationMapper {
 
-    private final ServiceMapper serviceMapper; // <-- Dependência
+    private final ServiceMapper serviceMapper;
 
     public VisitNegotiationMapper(ServiceMapper serviceMapper) { // <-- Injeção
         this.serviceMapper = serviceMapper;
     }
 
-    public VisitNegotiationEntity toEntity(VisitNegotiation domain) { // <-- 'static' removido
+    public VisitNegotiationEntity toEntity(VisitNegotiation domain) {
         if (domain == null) return null;
         return new VisitNegotiationEntity(
                 domain.getId(),
-                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
+                serviceMapper.toEntity(domain.getService()),
                 domain.getPropeser(),
                 domain.getVisitDate(),
                 domain.getSentDate(),
@@ -26,11 +26,11 @@ public class VisitNegotiationMapper {
         );
     }
 
-    public VisitNegotiation toDomain(VisitNegotiationEntity entity) { // <-- 'static' removido
+    public VisitNegotiation toDomain(VisitNegotiationEntity entity) {
         if (entity == null) return null;
         return new VisitNegotiation(
                 entity.getId(),
-                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
+                serviceMapper.toDomain(entity.getService()),
                 entity.getProposer(),
                 entity.getVisitDate(),
                 entity.getSentDate(),

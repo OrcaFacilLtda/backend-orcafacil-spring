@@ -43,6 +43,7 @@ public class BudgetRevisionRequestEntity {
         }
     }
 
+    // Getters e setters
     public Integer getId() {
         return id;
     }

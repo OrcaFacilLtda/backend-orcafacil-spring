@@ -134,8 +134,6 @@ public class BusinessServiceController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Serviços do prestador listados.", services));
     }
 
-
-
     @GetMapping("/{serviceId}/materials")
     public ResponseEntity<ApiResponse<List<MaterialList>>> getMaterialsByServiceId(@PathVariable Integer serviceId) {
         List<MaterialList> materials = service.findMaterialsByServiceId(serviceId);

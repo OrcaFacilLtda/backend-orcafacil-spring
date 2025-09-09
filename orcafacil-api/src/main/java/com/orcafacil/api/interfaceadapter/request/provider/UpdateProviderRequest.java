@@ -18,6 +18,7 @@ public class UpdateProviderRequest {
     @NotNull(message = "Categoria é obrigatória")
     private Integer categoryId;
 
+    // Getters e setters
     public UserUpdateRequest getUserUpdateRequest() {
         return userUpdateRequest;
     }

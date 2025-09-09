@@ -28,8 +28,8 @@ public class UserMapper {
         return new User(
                 entity.getId(),
                 entity.getName(),
-                entity.getPhone(),           // ✅ Corrigido: estava sendo passado o email aqui
-                entity.getEmail(),           // ✅ Corrigido: estava sendo passado o phone aqui
+                entity.getPhone(),
+                entity.getEmail(),
                 entity.getPassword(),
                 entity.getCpf(),
                 entity.getUserType(),

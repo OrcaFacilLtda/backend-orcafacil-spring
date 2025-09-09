@@ -7,13 +7,20 @@ public class ProviderChartData {
     private List<String> earningsByMonthLabels;
     private List<Double> earningsByMonthData;
 
-    // Getters e Setters
+    // Getters e setters
     public List<String> getServicesByMonthLabels() { return servicesByMonthLabels; }
+
     public void setServicesByMonthLabels(List<String> servicesByMonthLabels) { this.servicesByMonthLabels = servicesByMonthLabels; }
+
     public List<Long> getServicesByMonthData() { return servicesByMonthData; }
+
     public void setServicesByMonthData(List<Long> servicesByMonthData) { this.servicesByMonthData = servicesByMonthData; }
+
     public List<String> getEarningsByMonthLabels() { return earningsByMonthLabels; }
+
     public void setEarningsByMonthLabels(List<String> earningsByMonthLabels) { this.earningsByMonthLabels = earningsByMonthLabels; }
+
     public List<Double> getEarningsByMonthData() { return earningsByMonthData; }
+
     public void setEarningsByMonthData(List<Double> earningsByMonthData) { this.earningsByMonthData = earningsByMonthData; }
 }

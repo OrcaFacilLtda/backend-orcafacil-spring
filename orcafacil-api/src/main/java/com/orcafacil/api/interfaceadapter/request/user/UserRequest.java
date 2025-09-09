@@ -38,6 +38,7 @@ public class UserRequest {
     @NotNull(message = "Id do Endereço é obrigatório.")
     private AddressRequest address;
 
+    // Getters e setters
     public String getName() {
         return name;
     }

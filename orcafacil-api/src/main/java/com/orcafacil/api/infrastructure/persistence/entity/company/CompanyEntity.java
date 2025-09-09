@@ -37,8 +37,7 @@ public class CompanyEntity {
         this.createdAt = createdAt != null ? new Date(createdAt.getTime()) : new Date();
     }
 
-    // === Getters and Setters ===
-
+    // Getters e setters
     public Integer getId() {
         return id;
     }

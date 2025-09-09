@@ -5,10 +5,10 @@ import com.orcafacil.api.infrastructure.persistence.entity.materiallist.Material
 import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
 import org.springframework.stereotype.Component;
 
-@Component // 1. Transforma em um componente Spring
+@Component
 public class MaterialListMapper {
 
-    private final ServiceMapper serviceMapper; // 2. Injeta o ServiceMapper
+    private final ServiceMapper serviceMapper;
 
     public MaterialListMapper(ServiceMapper serviceMapper) {
         this.serviceMapper = serviceMapper;

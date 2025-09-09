@@ -53,6 +53,16 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Usuário atualizado com sucesso.", updated));
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<User>> updateUserStatus(@PathVariable Integer id, @RequestBody Map<String, String> statusUpdate) {
+        String newStatus = statusUpdate.get("status");
+        if (newStatus == null) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "O campo 'status' é obrigatório.", null));
+        }
+        User updatedUser = userService.updateStatus(id, UserStatus.valueOf(newStatus.toUpperCase()));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Status do usuário atualizado com sucesso.", updatedUser));
+    }git
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Integer id) {
         userService.delete(id);
@@ -99,16 +109,6 @@ public class UserController {
     public ResponseEntity<ApiResponse<List<User>>> findByStatus(@PathVariable UserStatus status) {
         List<User> users = userService.findByStatus(status);
         return ResponseEntity.ok(new ApiResponse<>(true, "Usuários encontrados por status.", users));
-    }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<ApiResponse<User>> updateUserStatus(@PathVariable Integer id, @RequestBody Map<String, String> statusUpdate) {
-        String newStatus = statusUpdate.get("status");
-        if (newStatus == null) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "O campo 'status' é obrigatório.", null));
-        }
-        User updatedUser = userService.updateStatus(id, UserStatus.valueOf(newStatus.toUpperCase()));
-        return ResponseEntity.ok(new ApiResponse<>(true, "Status do usuário atualizado com sucesso.", updatedUser));
     }
 
     @GetMapping("/me")

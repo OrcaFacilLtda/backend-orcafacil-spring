@@ -30,7 +30,7 @@ public class UserUpdateRequest {
 
     private AddressRequest address;
 
-
+    // Getters e setters
     public String getName() {return name;}
 
     public void setName(String name) {this.name = name;}

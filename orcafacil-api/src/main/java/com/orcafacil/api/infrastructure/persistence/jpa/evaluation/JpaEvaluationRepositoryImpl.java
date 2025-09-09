@@ -19,7 +19,7 @@ public class JpaEvaluationRepositoryImpl implements EvaluationRepository {
         this.mapper = mapper;
     }
 
-    @Override // <-- Anotação @Override para indicar que estamos a cumprir o contrato
+    @Override
     public Evaluation save(Evaluation evaluation) {
         EvaluationEntity entity = mapper.toEntity(evaluation);
         EvaluationEntity savedEntity = springRepository.save(entity);

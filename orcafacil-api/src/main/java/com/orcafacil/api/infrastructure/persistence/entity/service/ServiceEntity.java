@@ -39,7 +39,6 @@ public class ServiceEntity {
     @Column(name = "technical_visit_date")
     private Date technicalVisitDate;
 
-    // --- CAMPOS DE CONFIRMAÇÃO BILATERAL ADICIONADOS ---
     @Column(name = "client_visit_confirmed", nullable = false)
     private Boolean clientVisitConfirmed = false;
 
@@ -57,7 +56,6 @@ public class ServiceEntity {
 
     @Column(name = "provider_materials_confirmed", nullable = false)
     private Boolean providerMaterialsConfirmed = false;
-    // --- FIM DOS CAMPOS ADICIONADOS ---
 
     @Temporal(TemporalType.DATE)
     @Column(name = "negotiated_start_date")
@@ -73,7 +71,7 @@ public class ServiceEntity {
     @Column(name = "budget_finalized", nullable = false)
     private Boolean budgetFinalized = false;
 
-    // Getters e Setters para todos os campos...
+    // Getters e setters
     public Integer getId() {
         return id;
     }

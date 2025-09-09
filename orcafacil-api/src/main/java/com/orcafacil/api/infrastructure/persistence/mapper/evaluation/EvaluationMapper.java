@@ -5,30 +5,30 @@ import com.orcafacil.api.infrastructure.persistence.entity.evaluation.Evaluation
 import com.orcafacil.api.infrastructure.persistence.mapper.service.ServiceMapper;
 import org.springframework.stereotype.Component;
 
-@Component // <-- Adicionado
+@Component
 public class EvaluationMapper {
 
-    private final ServiceMapper serviceMapper; // <-- Dependência
+    private final ServiceMapper serviceMapper;
 
     public EvaluationMapper(ServiceMapper serviceMapper) { // <-- Injeção
         this.serviceMapper = serviceMapper;
     }
 
-    public EvaluationEntity toEntity(Evaluation domain) { // <-- 'static' removido
+    public EvaluationEntity toEntity(Evaluation domain) {
         if (domain == null) return null;
         return new EvaluationEntity(
                 domain.getId(),
-                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
+                serviceMapper.toEntity(domain.getService()),
                 domain.getStars(),
                 domain.getEvaluationDate()
         );
     }
 
-    public Evaluation toDomain(EvaluationEntity entity) { // <-- 'static' removido
+    public Evaluation toDomain(EvaluationEntity entity) {
         if (entity == null) return null;
         return new Evaluation(
                 entity.getId(),
-                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
+                serviceMapper.toDomain(entity.getService()),
                 entity.getStars(),
                 entity.getEvaluationDate()
         );

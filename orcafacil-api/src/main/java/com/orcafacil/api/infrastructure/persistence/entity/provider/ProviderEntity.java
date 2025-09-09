@@ -32,6 +32,7 @@ public class ProviderEntity {
         this.category = category;
     }
 
+    // Getters e setters
     public UserEntity getUser() {
         return user;
     }

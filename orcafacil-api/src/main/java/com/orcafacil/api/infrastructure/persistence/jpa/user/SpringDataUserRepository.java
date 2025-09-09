@@ -19,7 +19,7 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, Inte
 
     Optional<UserEntity> findByEmail(String email);
     Optional<UserEntity> findByCpf(String cpf);
-    List<UserEntity> findByUserType(UserType userType); // Ajustado para usar Enum
+    List<UserEntity> findByUserType(UserType userType);
     List<UserEntity> findByStatus(UserStatus status);
 
 

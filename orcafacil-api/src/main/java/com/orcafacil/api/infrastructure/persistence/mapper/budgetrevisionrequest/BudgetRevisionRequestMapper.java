@@ -10,27 +10,26 @@ import org.springframework.stereotype.Component;
 public class BudgetRevisionRequestMapper {
 
     private final ServiceMapper serviceMapper; // <-- Dependência
-    // UserMapper pode continuar static pois não tem dependências
 
     public BudgetRevisionRequestMapper(ServiceMapper serviceMapper) { // <-- Injeção
         this.serviceMapper = serviceMapper;
     }
 
-    public BudgetRevisionRequestEntity toEntity(BudgetRevisionRequest domain) { // <-- 'static' removido
+    public BudgetRevisionRequestEntity toEntity(BudgetRevisionRequest domain) {
         if (domain == null) return null;
         return new BudgetRevisionRequestEntity(
                 domain.getId(),
-                serviceMapper.toEntity(domain.getService()), // <-- Chamada de instância
+                serviceMapper.toEntity(domain.getService()),
                 UserMapper.toEntity(domain.getClient()),
                 domain.getRequestDate()
         );
     }
 
-    public BudgetRevisionRequest toDomain(BudgetRevisionRequestEntity entity) { // <-- 'static' removido
+    public BudgetRevisionRequest toDomain(BudgetRevisionRequestEntity entity) {
         if (entity == null) return null;
         return new BudgetRevisionRequest(
                 entity.getId(),
-                serviceMapper.toDomain(entity.getService()), // <-- Chamada de instância
+                serviceMapper.toDomain(entity.getService()),
                 UserMapper.toDomain(entity.getClient()),
                 entity.getRequestDate()
         );

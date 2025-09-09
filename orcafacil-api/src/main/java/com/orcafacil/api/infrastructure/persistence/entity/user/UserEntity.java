@@ -61,7 +61,7 @@ public class UserEntity {
         this.address = address;
     }
 
-
+    // Getters e setters
     public Integer getId() {
         return id;
     }
