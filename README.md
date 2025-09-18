@@ -1,12 +1,12 @@
-# 🧩 OrçaFácil - Módulo Back-End
+# 🧩 OrçaFácil - Módulo Back-End (Projeto Estudantil)
 
-Este repositório contém o **módulo back-end** do projeto **OrçaFácil**, responsável por fornecer os serviços de API, lógica de negócio e integração com banco de dados para os demais componentes da aplicação (mobile e web).
+Este repositório contém o **módulo back-end** do projeto **OrçaFácil**, desenvolvido como **projeto acadêmico/estudantil**. O objetivo é **praticar boas práticas de desenvolvimento** em Java e Spring Boot, incluindo arquitetura limpa, DTOs, Repository Pattern e integração com banco de dados.
 
-> ⚠️ Este repositório representa **apenas uma parte do sistema completo** OrçaFácil.
+> ⚠️ Este repositório representa **apenas uma parte do sistema completo** OrçaFácil e não é um produto comercial.
 
 ---
 
-## ✅ Funcionalidades
+## ✅ Funcionalidades Implementadas
 
 - 🔐 Autenticação e autorização de usuários
 - 🧑‍💼 Cadastro e gerenciamento de prestadores de serviço
@@ -14,7 +14,7 @@ Este repositório contém o **módulo back-end** do projeto **OrçaFácil**, res
 - 💬 Envio de propostas por prestadores
 - 🗂️ Gestão de categorias e subcategorias de serviço
 - 📝 Histórico de interações entre usuários
-- 📊 Relatórios administrativos
+- 📊 Relatórios administrativos (simulados)
 
 ---
 
@@ -23,7 +23,7 @@ Este repositório contém o **módulo back-end** do projeto **OrçaFácil**, res
 - Linguagem: Java 17
 - Framework: Spring Boot
 - Banco de Dados: SQL Server
-- Padrões: RESTful API, DTOs, Repository Pattern
+- Padrões aplicados: RESTful API, DTOs, Repository Pattern
 - Documentação automática via Swagger/OpenAPI
 - Arquivo `Dockerfile` incluso para facilitar a criação de imagens do projeto
 
@@ -31,10 +31,9 @@ Este repositório contém o **módulo back-end** do projeto **OrçaFácil**, res
 
 ## 🔗 Integração com outros módulos
 
-Este back-end se conecta aos seguintes módulos do ecossistema OrçaFácil:
+Este back-end foi desenvolvido para se integrar ao módulo front-end:
 
-- `orcafacil-frontend`: interface web em React
-- `orcafacil-mobile`: aplicativo Android em Kotlin
+- `orcafacil-frontend`: interface web em React (projeto estudantil)
 
 ---
 
@@ -44,5 +43,5 @@ Distribuído sob a **Licença de Uso Estudantil**. Veja [LICENSE](./LICENSE) par
 
 ---
 
-> Desenvolvido por **OrçaFacilLtda** • Parte integrante do ecossistema OrçaFácil  
+> Desenvolvido como **projeto acadêmico/estudantil** por **OrçaFacilLtda** • Parte integrante do ecossistema OrçaFácil  
 > © 2025 Todos os direitos reservados
